@@ -1,0 +1,195 @@
+/*======================================Shared=================================*/
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+#root {
+  /* padding: 10px; */
+  height: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+nav {
+  background-color: #000366;
+  border-bottom: 2px solid white;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  padding: 5px;
+  z-index: 999;
+}
+nav a{
+  height: 100%;
+  margin: 0 5px;
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #767676;
+  background-color: #333;
+  font-size: 2rem;
+}
+
+article{
+  margin-top: 50px;
+  flex-grow: 1;
+}
+
+section::after, section::before {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 2px;
+  background-color: rgb(71, 71, 165);
+  margin-top: 10px;
+  clear: both;
+}
+
+#copyright{
+  margin-top: auto;
+  width: 100%;
+  bottom: 0;
+}
+
+.outline-text{
+  color: white;
+  background-color: white;
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+/*======================================Tasks=================================*/
+.task-grid {
+  max-height: 100vh;
+  overflow-y: auto;
+  display: flex; 
+  flex-flow: wrap;
+  justify-content: center;
+  gap: 16px; 
+  padding: 20px;
+  margin: 1em;
+  background-color: #767676;
+  border: 1px solid rgb(212, 212, 212);
+  border-radius: 5px;
+}
+
+.task-container {
+  flex-grow: 1;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 5px black;
+  width: 300px;
+  box-sizing: border-box; 
+}
+
+.task-container table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.task-container th {
+  text-align: center;
+  padding: 0 5px;
+  font-weight: bold;
+  color: #333;
+}
+
+.task-container td {
+  padding: 8px 0;
+  color: #555;
+}
+
+.task-container label {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.task-buttons{
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 100%;
+}
+.left-buttons {
+  display: flex;
+  justify-content: center;
+  flex-grow: 1;
+}
+.task-buttons button{
+  margin: 0 4px;
+  flex: 1;
+  box-sizing: border-box;
+  height: 100%;
+  border: 1px solid black;
+}
+
+.toggle-button {
+  transition: background-color 0.3s;
+}
+.active {
+  background-color: green;
+}
+.inactive {
+  background-color: red; 
+}
+.toggle-button:hover{
+  transform: scale(1.05);
+}
+
+.edit-button {
+  background-color: rgb(28, 28, 158);
+  max-width: 25%;
+}
+.confirm-button {
+  background-color: rgb(37, 173, 37);
+}
+.delete-button{
+  background-color :#333;
+  max-width: 20%;
+}
+.cancel-button{
+  background-color: #767676;
+}
+/*====================================Settings================================*/
+#theme-button-light{
+  background-color: white;
+  color: black;
+}
+#theme-button-dark{
+
+}
+#theme-button-rainbow{
+  background: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet, red);
+}
+
+#setting-theme button{
+  margin: 10px;
+}
+#setting-mode label *{
+  margin: 10px;
+}
+
+/*=====================================About==================================*/
+#about-credits {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+#credit-table {
+  border: 2px solid rgb(140 140 140);
+
+}
+caption {
+  caption-side: bottom;
+  padding: 10px;
+}
+thead, tfoot {
+  background-color: rgb(96, 98, 253);
+}
+th, td {
+  border: 1px solid rgb(160 160 160);
+}
