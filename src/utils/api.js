@@ -52,24 +52,8 @@ export const addTag = async (name) => {
   }
 };
 
-//can replace with useState(tags) in React
-const fetchTags = async () => {
+const checkIfTagsExists = async (tags, existingTags) => {
   try {
-    const response = await fetch(`${API}/tags`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch tags");
-    }
-    const data = await response.json();
-    return data; // Return array of tag objects
-  } catch (error) {
-    console.error("Error getting: ", error);
-    throw error;
-  }
-};
-
-const checkIfTagsExists = async (tags) => {
-  try {
-    const existingTags = await fetchTags();
     const newTags = tags.split(",").map((tag) => tag.trim());
     const tagIds = [];
     for (const tag of newTags) {
@@ -78,11 +62,9 @@ const checkIfTagsExists = async (tags) => {
       );
       if (existingTag) {
         tagIds.push(existingTag.id);
-        console.log(`Tag already exists: ${tag}`);
       } else {
         const newTag = await addTag(tag);
-        tagIds.push(newTag.id); // Push new tag's ID
-        console.log(`Added new tag: ${tag}`);
+        tagIds.push(newTag.id);
       }
     }
     return tagIds.join(",");
@@ -92,11 +74,11 @@ const checkIfTagsExists = async (tags) => {
   }
 };
 
-export const addTask = async (newTaskData) => {
+export const addTask = async (newTaskData, allTags) => {
   try {
     // Make copy so as not to manipulate original data
     const taskDataCopy = { ...newTaskData };
-    const newTagIDs = await checkIfTagsExists(newTaskData.tags);
+    const newTagIDs = await checkIfTagsExists(newTaskData.tags, allTags);
     taskDataCopy.tags = newTagIDs; // Update tags to be tag IDs with "," delimiter
 
     const response = await fetch(`${API}/tasks`, {
@@ -118,7 +100,8 @@ export const addTask = async (newTaskData) => {
   }
 };
 
-export const deleteTask = async (id) => {
+// Delete task and all timestamps associated with it
+export const deleteTask = async (id, timestamps) => {
   try {
     const response = await fetch(`${API}/tasks/${id}`, {
       method: "DELETE",
@@ -126,14 +109,15 @@ export const deleteTask = async (id) => {
     if (!response.ok) {
       throw new Error("Failed to delete task");
     }
+    await deleteTimestamp(id, timestamps);
   } catch (error) {
     console.error("Error deleting task:", error);
     throw error;
   }
 };
 
-//Might need to add second argument of React's tags useState
-export const deleteTag = async (tagId) => {
+// Delete tag and remove deleted tag from all existing tasks housing it
+export const deleteTag = async (tagId, tasks) => {
   try {
     const deleteResponse = await fetch(`${API}/tags/${tagId}`, {
       method: "DELETE",
@@ -144,22 +128,10 @@ export const deleteTag = async (tagId) => {
       throw new Error("Failed to delete tag");
     }
 
-    console.log(`Tag with ID ${tagId} deleted successfully`);
-
-    // Get all current tasks
-    // Change to React's tags useState
-    const tasksResponse = await fetch(`${API}/tasks`);
-    if (!tasksResponse.ok) {
-      throw new Error("Failed to fetch tasks");
-    }
-
-    const tasks = await tasksResponse.json();
     // Find tasks with the id of the deleted tag
     const tasksToUpdate = tasks.filter((task) => task.tags.includes(tagId));
 
-    // Update each task that had the deleted tag
     for (const task of tasksToUpdate) {
-      // Remove the tag ID from the task's tags
       const updatedTags = task.tags
         .split(",")
         .filter((id) => id !== String(tagId))
@@ -170,21 +142,17 @@ export const deleteTag = async (tagId) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...task, tags: updatedTags }),
       });
-
-      console.log(`Task ${task.id} updated to remove tag ${tagId}`);
     }
-
-    console.log(`All tasks updated to remove the deleted tag ${tagId}`);
   } catch (error) {
     console.error("Error deleting tag or updating tasks:", error);
     throw error;
   }
 };
 
-export const updateTask = async (id, updatedTask) => {
+export const updateTask = async (id, updatedTask, allTags) => {
   try {
-    const newTagIDs = await checkIfTagsExists(updatedTask.tags);
-    updatedTask.tags = newTagIDs; // Update tags to be tag IDs with "," delimiter
+    const newTagIDs = await checkIfTagsExists(updatedTask.tags, allTags);
+    updatedTask.tags = newTagIDs;
 
     const response = await fetch(`${API}/tasks/${id}`, {
       method: "PUT",
@@ -196,9 +164,52 @@ export const updateTask = async (id, updatedTask) => {
       throw new Error("Failed to update task");
     }
 
-    return await response.json(); // Return the updated task data
+    return await response.json();
   } catch (error) {
     console.error("Error updating task:", error);
     throw error;
+  }
+};
+
+export const addTimestamp = async (time, task, type) => {
+  try {
+    const response = await fetch(`${API}/timestamps`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        timestamp: time,
+        task: task,
+        type: type,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to add timestamp");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error adding timestamp:", error);
+    throw error;
+  }
+}
+
+const deleteTimestamp = async (taskId, timestamps) => {
+  for (const timestamp of timestamps) {
+    if (timestamp.task === taskId) {
+      try {
+        const response = await fetch(`${API}/timestamps/${timestamp.id}`, {
+          method: "DELETE",
+        });
+        if (!response.ok) {
+          throw new Error("Failed to delete timestamp");
+        }
+      } catch (error) {
+        console.error("Error deleting timestamp:", error);
+        throw error;
+      }
+    }
   }
 };
