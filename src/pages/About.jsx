@@ -64,8 +64,15 @@ function About() {
         <h3>AI Usage:</h3>
         <ul>
           <li>
-            <p>CSS for task-buttons. When I clicked edit button and rendered the other buttons, it messed up the sizing of the table
+            <p>
+              CSS for task-buttons. When I clicked edit button and rendered the other buttons, it messed up the sizing of the table
               and components were leaking over, so I asked ChatGPT to help fix it.
+            </p>
+          </li>
+          <li>
+            <p>
+              Formatting date objects to UTC when adding/deleting timestamps to backend, 
+              and updating timestamp state.
             </p>
           </li>
         </ul>
