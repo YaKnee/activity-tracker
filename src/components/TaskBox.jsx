@@ -1,139 +1,135 @@
 import { React, useState, useEffect } from "react";
 import { FaFilePen, FaTrashCan } from 'react-icons/fa6';
-import { deleteTask, updateTask } from "../utils/api";
+import { deleteTask, updateTask, addTimestamp } from "../utils/api";
+import { getTagNames, getTotalActiveTimeOfTask, parseTimestampAsUTC} from "../utils/apiDataManipulation";
 import "../styles/App.css";
 
-const TaskBox = ({ id, name, tags, allTags, timestamps, setTasks }) => {
-  
-  // Function to convert tag IDs to tag names
-  const getTagNames = (tagIds) => {
-    // Need ternary operation as was crashing without (include as AI use)
-    return (tagIds ? tagIds.split(",") : []).map(tagId => {
-      const tag = allTags.find(tag => tag.id === parseInt(tagId.trim()));
-      return tag ? tag.name : tagId; // Return tag name or original ID if not found
-    }).join(", ");
-  };
-  
-  const tagNames = getTagNames(tags);
+const getInitialTaskState = (name, tags, allTags, timestamps) => {
+  const tagNames = getTagNames(tags, allTags);
+  const totalActiveTime = getTotalActiveTimeOfTask(timestamps);
+  const lastTimestamp = timestamps.length > 0 ? timestamps[timestamps.length - 1] : null;
+  const isActive = lastTimestamp ? lastTimestamp.type === 1 : false;
 
-  const [timerState, setTimerState] = useState({
-    active: false,
-    startTime: null,
-    endTime: null,
-    totalActiveDuration: 0,
-    activeDuration: 0,
-  });
-  const [editMode, setEditMode] = useState(false);
-  const [editedTask, setEditedTask] = useState({ name: "", tags: "" });
+  const initialActiveDuration = isActive
+    ? totalActiveTime + (new Date().getTime() - parseTimestampAsUTC(lastTimestamp.timestamp).getTime())
+    : totalActiveTime;
+
+  return {
+    name,
+    tags: tagNames,
+    active: isActive,
+    startTime: isActive ? parseTimestampAsUTC(lastTimestamp.timestamp) : null,
+    endTime: isActive ? null : (lastTimestamp ? parseTimestampAsUTC(lastTimestamp.timestamp) : null),
+    totalActiveDuration: initialActiveDuration,
+  };
+};
+
+const TaskBox = ({ id, name, tags, allTags, timestamps, setTasks, setTimestamps }) => {
+    
+  const [taskState, setTaskState] = useState(() => getInitialTaskState(name, tags, allTags, timestamps));
+
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  const [editState, setEditState] = useState({ name: taskState.name, tags: taskState.tags });
 
   useEffect(() => {
-    setEditedTask({ name, tags });
-  }, [name, tags]); // Ensure to sync editedTask with props
+    setTaskState(getInitialTaskState(name, tags, allTags, timestamps));
+  }, [name, tags, allTags, timestamps]);
+  
+  useEffect(() => {
+    setEditState({ name: taskState.name, tags: taskState.tags });
+  }, [taskState.name, taskState.tags]);
 
-  //   // Get the start and end timestamps for this task
-  // const startTimes = timestamps.filter(t => t.type === 0);
-  // const endTimes = timestamps.filter(t => t.type === 1);
 
-
-
-  // useEffect(() => {
-  //   // Only run if startTime or endTime changes
-  //   if (startTime.length > 0) {
-  //     const lastStartTime = new Date(startTime[startTime.length - 1].timestamp);
-  //     setTimerState(prev => ({
-  //       ...prev,
-  //       startTime: lastStartTime,
-  //       active: true,
-  //     }));
-  //   } else if (endTime.length > 0) {
-  //     const lastEndTime = new Date(endTime[endTime.length - 1].timestamp);
-  //     setTimerState(prev => ({
-  //       ...prev,
-  //       endTime: lastEndTime,
-  //       active: false,
-  //     }));
-  //   }
-  // }, [startTime, endTime]);
-
+  // Update totalActiveDuration every second if the task is active
   useEffect(() => {
     let timer;
-    if (timerState.active) {
+    if (taskState.active) {
       timer = setInterval(() => {
-        const now = new Date();
-        const elapsed = Math.floor((now - timerState.startTime) / 1000);
-        setTimerState(prevState => ({
+        setTaskState(prevState => ({
           ...prevState,
-          activeDuration: elapsed,
+          totalActiveDuration: prevState.totalActiveDuration + 1000,
         }));
       }, 1000);
     }
     return () => clearInterval(timer);
-  }, [timerState.active, timerState.startTime]); // Only depend on timer state
+  }, [taskState.active])
 
-  const toggleActive = () => {
+  // Toggle active state and post timestamp dependant on active state
+  const toggleActive = async () => {
     const now = new Date();
-    setTimerState(prevState => {
-      if (prevState.active) {
-        return {
-          ...prevState,
-          active: false,
-          endTime: now,
-          totalActiveDuration: prevState.totalActiveDuration + prevState.activeDuration,
-          activeDuration: 0,
-        };
-      } else {
-        return {
-          ...prevState,
-          active: true,
-          startTime: now,
-          endTime: null,
-        };
-      }
-    });
-  };
+    const nowFormattedForPostRequest =
+      now.toISOString().slice(0, 19).replace("T", " ") 
+      + '.' + String(now.getMilliseconds()).padStart(3, '0');
 
-  const formatDuration = (seconds) => {
-    if (seconds >= 86400) {
-      const days = Math.floor(seconds / 86400);
-      const hours = Math.floor((seconds % 86400) / 3600);
-      const minutes = Math.floor((seconds % 3600) / 60);
-      const secs = seconds % 60;
-      return `${String(days).padStart(2, "0")}:${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
-    } else {
-      const hours = Math.floor(seconds / 3600);
-      const minutes = Math.floor((seconds % 3600) / 60);
-      const secs = seconds % 60;
-      return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+    const newType = taskState.active ? 0 : 1;
+    try {
+      const newTimestampId = 
+        await addTimestamp(nowFormattedForPostRequest, id, newType);
+      
+      const newTimestamp = {
+        id: newTimestampId.id,
+        timestamp: nowFormattedForPostRequest,
+        task: id,
+        type: newType,
+      };
+      setTimestamps(prevTimestamps => [...prevTimestamps, newTimestamp]);
+
+      setTaskState(prevState => ({
+        ...prevState,
+        active: !prevState.active,
+        startTime: newType === 1 ? now : prevState.startTime,
+        endTime: newType === 0 ? now : null,
+      }));
+    } catch (error) {
+      console.error("Error toggling task active state:", error);
     }
   };
+
+  const formatDuration = (totalTime) => {
+    const totalSeconds = Math.round(totalTime / 1000);
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
   
-  const handleEditClick = () => setEditMode(true);
+    return days > 0
+      ? `${String(days).padStart(2, "0")}:${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
+      : `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  };
+  
+  
+  const handleEditClick = () => setIsEditMode(true);
 
   const handleDeleteClick = async () => {
     try {
-      await deleteTask(id);
-      setTasks(prevTasks => prevTasks.filter(task => task.id !== id)); // Update the tasks state in the parent component
+      await deleteTask(id, timestamps);
+      setTasks(prevTasks => prevTasks.filter(task => task.id !== id));
     } catch (error) {
       console.error("Error deleting task:", error);
     }
   };
 
   const handleCancelClick = () => {
-    setEditMode(false);
-    setEditedTask({ name, tags }); // Reset to original values
+    setIsEditMode(false);
+    setEditState({ name: taskState.name, tags: taskState.tags });
   };
 
   const handleConfirmClick = async () => {
     try {
       const updatedTaskData = {
-        name: editedTask.name,
-        tags: editedTask.tags.split(",").map(tag => tag.trim()),
+        name: editState.name,
+        tags: editState.tags,
       };
 
-      const updatedTask = await updateTask(id, updatedTaskData); 
-      // Replace old task with updated task in UI
+      const updatedTask = await updateTask(id, updatedTaskData, allTags); 
       setTasks(prevTasks => prevTasks.map(task => (task.id === id ? updatedTask : task)));
-      setEditMode(false); // Exit edit mode
+      setTaskState(prevState => ({
+        ...prevState,
+        name: updatedTask.name,
+        tags: getTagNames(updatedTask.tags, allTags),
+      }));
+      setIsEditMode(false);
     } catch (error) {
       console.error("Error updating task:", error);
     }
@@ -142,9 +138,9 @@ const TaskBox = ({ id, name, tags, allTags, timestamps, setTasks }) => {
   //NEEDED?
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setEditedTask(prevState => ({
+    setEditState(prevState => ({
       ...prevState,
-      [name]: name === "tags" ? value.split(",").map(tag => tag.trim()) : value,
+      [name]: name === "tags" ? value.split(",").map(tag => tag.trim()).join(",") : value,
     }));
   };
 
@@ -154,34 +150,34 @@ const TaskBox = ({ id, name, tags, allTags, timestamps, setTasks }) => {
         <tr>
           <th>Name:</th>
           <td>
-            {editMode ? <input name="name" type="text" value={editedTask.name} onChange={handleInputChange} />
-                      : name}
+            {isEditMode ? <input name="name" type="text" value={editState.name} onChange={handleInputChange} />
+                        : taskState.name}
           </td>
         </tr>
         <tr>
           <th>Tags:</th>
           <td>
-            {editMode ? <input name="tags" type="text" value={editedTask.tags} onChange={handleInputChange} />
-                      : tagNames}
+            {isEditMode ? <input name="tags" type="text" value={editState.tags} onChange={handleInputChange} />
+                        : taskState.tags}
           </td>
         </tr>
         <tr>
           <th>Start Time:</th>
-          <td>{timerState.startTime ? timerState.startTime.toLocaleString() : "N/A"}</td>
+          <td>{taskState.active ? taskState.startTime.toLocaleString() : "N/A"}</td>
         </tr>
         <tr>
           <th>End Time:</th>
-          <td>{timerState.endTime ? timerState.endTime.toLocaleString() : "N/A"}</td>
+          <td>{taskState.active ? "N/A" : (timestamps.length > 0 ? taskState.endTime.toLocaleString() : "N/A")}</td>
         </tr>
         <tr>
           <th>Total Duration:</th>
-          <td>{formatDuration(timerState.activeDuration + timerState.totalActiveDuration)}</td>
+          <td>{formatDuration(taskState.totalActiveDuration)}</td>
         </tr>
         <tr>
           <td colSpan="2">
             <div className="task-buttons">
               <div className="left-buttons">
-                {!editMode ? (
+                {!isEditMode ? (
                   <button className="edit-button" onClick={handleEditClick}><FaFilePen /></button>
                 ) : (
                   <>
@@ -190,13 +186,13 @@ const TaskBox = ({ id, name, tags, allTags, timestamps, setTasks }) => {
                   </>
                 )}
                 <button
-                  className={`toggle-button ${timerState.active ? "active" : "inactive"}`}
+                  className={`toggle-button ${taskState.active ? "active" : "inactive"}`}
                   onClick={toggleActive}
                 >
-                  {timerState.active ? "Active" : "Inactive"}
+                  {taskState.active ? "Active" : "Inactive"}
                 </button>
               </div>
-              {editMode && <button className="delete-button" onClick={handleDeleteClick}><FaTrashCan /></button>}
+              {isEditMode && <button className="delete-button" onClick={handleDeleteClick}><FaTrashCan /></button>}
             </div>
           </td>
         </tr>
