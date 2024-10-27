@@ -1,11 +1,14 @@
 
   // Function to convert tag IDs to tag names
-export const getTagNames = (tagIds, allTags) => {
-  // Need ternary operation as was crashing without (include as AI use)
-  return (tagIds ? tagIds.split(",") : []).map(tagId => {
+
+
+export const getTagNames = (taskIds, allTags) => {
+
+  const tagNames = taskIds.split(",").map(tagId => {
     const tag = allTags.find(tag => tag.id === parseInt(tagId.trim()));
     return tag ? tag.name : tagId; // Return tag name or original ID if not found
-  }).join(", ");
+  })
+  return tagNames.join(", ");
 };
 
 export const getTotalActiveTimeOfTask = (timestamps) => {

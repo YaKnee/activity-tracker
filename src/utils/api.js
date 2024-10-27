@@ -44,8 +44,8 @@ export const addTag = async (name) => {
     if (!response.ok) {
       throw new Error("Failed to add tag");
     }
-
-    return await response.json(); // Return the new tag data
+    const data = await response.json()
+    return data.id; // Return new tag ID
   } catch (error) {
     console.error("Error adding tag:", error);
     throw error;
@@ -55,45 +55,48 @@ export const addTag = async (name) => {
 const checkIfTagsExists = async (tags, existingTags) => {
   try {
     const newTags = tags.split(",").map((tag) => tag.trim());
-    const tagIds = [];
+    const existingTagIds = [];
+    const newTagObjects = [];
+
     for (const tag of newTags) {
-      const existingTag = existingTags.find(
-        (existingTag) => existingTag.name === tag
-      );
+      const existingTag = existingTags.find((existingTag) => existingTag.name === tag);
       if (existingTag) {
-        tagIds.push(existingTag.id);
+        existingTagIds.push(existingTag.id);
       } else {
-        const newTag = await addTag(tag);
-        tagIds.push(newTag.id);
+        const newTagId = await addTag(tag);
+        newTagObjects.push({ id: newTagId, name: tag }); 
+        existingTagIds.push(newTagId);
       }
     }
-    return tagIds.join(",");
+    return { existingTagIds, newTagObjects };
   } catch (error) {
     console.error("Error checking or adding tags:", error);
     throw error;
   }
 };
 
-export const addTask = async (newTaskData, allTags) => {
+export const addTask = async (newTaskData, existingTags) => {
   try {
-    // Make copy so as not to manipulate original data
-    const taskDataCopy = { ...newTaskData };
-    const newTagIDs = await checkIfTagsExists(newTaskData.tags, allTags);
-    taskDataCopy.tags = newTagIDs; // Update tags to be tag IDs with "," delimiter
-
+    const { existingTagIds, newTagObjects } = await checkIfTagsExists(newTaskData.tags, existingTags);
+    newTaskData.tags = existingTagIds.join(",");
     const response = await fetch(`${API}/tasks`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(taskDataCopy),
+      body: JSON.stringify(newTaskData),
     });
 
     if (!response.ok) {
       throw new Error("Failed to add new task");
     }
-
-    return await response.json(); // Return the new task data
+    const newTaskResponse = await response.json();
+    const newTaskObject = {
+      id: newTaskResponse.id,
+      name: newTaskData.name,
+      tags: newTaskData.tags,
+    }
+    return { newTaskObject, newTagObjects };
   } catch (error) {
     console.error("Error adding task:", error);
     throw error;
@@ -109,7 +112,7 @@ export const deleteTask = async (id, timestamps) => {
     if (!response.ok) {
       throw new Error("Failed to delete task");
     }
-    await deleteTimestamp(id, timestamps);
+    await deleteTimestamps(id, timestamps);
   } catch (error) {
     console.error("Error deleting task:", error);
     throw error;
@@ -127,7 +130,7 @@ export const deleteTag = async (tagId, tasks) => {
     if (!deleteResponse.ok) {
       throw new Error("Failed to delete tag");
     }
-
+////CHECK IF OTHER FUNCTIONS CAN USE SAME .includes FUNCTION////////////////////////////////////////////////////////////////////////
     // Find tasks with the id of the deleted tag
     const tasksToUpdate = tasks.filter((task) => task.tags.includes(tagId));
 
@@ -151,20 +154,27 @@ export const deleteTag = async (tagId, tasks) => {
 
 export const updateTask = async (id, updatedTask, allTags) => {
   try {
-    const newTagIDs = await checkIfTagsExists(updatedTask.tags, allTags);
-    updatedTask.tags = newTagIDs;
+    const { existingTagIds, newTagObjects }= await checkIfTagsExists(updatedTask.tags, allTags);
+    // Copy the object so as not to manipulate original data
+    const updatedTaskCopy = {...updatedTask};
+    updatedTaskCopy.tags = existingTagIds.join(",");
 
     const response = await fetch(`${API}/tasks/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedTask),
+      body: JSON.stringify(updatedTaskCopy),
     });
 
     if (!response.ok) {
       throw new Error("Failed to update task");
     }
-
-    return await response.json();
+    const updatedTaskResponse = await response.json();
+    const updatedTaskObject = {
+      id: updatedTaskResponse.id,
+      name: updatedTask.name,
+      tags: updatedTask.tags
+    }
+    return { updatedTaskObject, newTagObjects };
   } catch (error) {
     console.error("Error updating task:", error);
     throw error;
@@ -188,15 +198,21 @@ export const addTimestamp = async (time, task, type) => {
     if (!response.ok) {
       throw new Error("Failed to add timestamp");
     }
-
-    return await response.json();
+    const newTimestampResponse = await response.json();
+    const newTimestampObject = {
+      id: newTimestampResponse.id,
+      timestamp: time,
+      task: task,
+      type: type
+    }
+    return newTimestampObject;
   } catch (error) {
     console.error("Error adding timestamp:", error);
     throw error;
   }
 }
 
-const deleteTimestamp = async (taskId, timestamps) => {
+const deleteTimestamps = async (taskId, timestamps) => {
   for (const timestamp of timestamps) {
     if (timestamp.task === taskId) {
       try {
