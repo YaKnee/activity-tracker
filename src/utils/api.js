@@ -1,228 +1,135 @@
 const API = "http://localhost:3010";
 
-export const fetchData = async () => {
+// Generic fetch function to handle API requests
+const apiFetch = async (url, options) => {
   try {
-    const [tasksResponse, tagsResponse, timestampsResponse, settingsResponse] =
-      await Promise.all([
-        fetch(`${API}/tasks`),
-        fetch(`${API}/tags`),
-        fetch(`${API}/timestamps`),
-        fetch(`${API}/options`),
-      ]);
-
-    if (
-      !tasksResponse.ok ||
-      !tagsResponse.ok ||
-      !timestampsResponse.ok ||
-      !settingsResponse.ok
-    ) {
-      throw new Error("Failed to fetch data");
+    const response = await fetch(url, options);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch ${url}`);
     }
+    return await response.json();
+  } catch (error) {
+    console.error("API fetch error:", error);
+    throw error;
+  }
+};
 
-    const tasksData = await tasksResponse.json();
-    const tagsData = await tagsResponse.json();
-    const timestampsData = await timestampsResponse.json();
-    const settingsData = await settingsResponse.json();
-
+// Fetches all data from database on App load
+export const fetchData = async () => {
+  const urls = [`${API}/tasks`, `${API}/tags`, `${API}/timestamps`, `${API}/options`];
+  const fetchPromises = urls.map(url => apiFetch(url));
+  
+  try {
+    const [tasksData, tagsData, timestampsData, settingsData] = await Promise.all(fetchPromises);
     return { tasksData, tagsData, timestampsData, settingsData };
   } catch (error) {
     console.error("Error fetching data:", error);
-    throw error; // Re-throw to handle in the calling function
+    throw error;
   }
 };
 
+// Adds new tag to database
 export const addTag = async (name) => {
-  try {
-    const response = await fetch(`${API}/tags`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to add tag");
-    }
-    const data = await response.json()
-    return data.id; // Return new tag ID
-  } catch (error) {
-    console.error("Error adding tag:", error);
-    throw error;
-  }
+  return await apiFetch(`${API}/tags`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ name }),
+  });
 };
 
+// Checks if specified tags exist and adds any new tags to the database
 const checkIfTagsExists = async (tags, existingTags) => {
-  try {
-    const newTags = tags.split(",").map((tag) => tag.trim());
-    const existingTagIds = [];
-    const newTagObjects = [];
+  const tagNames = tags.split(",").map((tag) => tag.trim());
+  const existingTagIds = [];
+  const newTagObjects = [];
 
-    for (const tag of newTags) {
-      const existingTag = existingTags.find((existingTag) => existingTag.name === tag);
-      if (existingTag) {
-        existingTagIds.push(existingTag.id);
-      } else {
-        const newTagId = await addTag(tag);
-        newTagObjects.push({ id: newTagId, name: tag }); 
-        existingTagIds.push(newTagId);
-      }
+  for (const tagName of tagNames) {
+    const existingTag = existingTags.find((existingTag) => existingTag.name === tagName);
+    if (existingTag) {
+      existingTagIds.push(existingTag.id);
+    } else {
+      const newTagObject = await addTag(tagName);
+      newTagObjects.push({ id: newTagObject.id, name: tagName });
+      existingTagIds.push(newTagObject.id);
     }
-    return { existingTagIds, newTagObjects };
-  } catch (error) {
-    console.error("Error checking or adding tags:", error);
-    throw error;
   }
+  return { existingTagIds, newTagObjects };
 };
 
+// Adds new task to the database, updating tags if necessary
 export const addTask = async (newTaskData, existingTags) => {
-  try {
-    const { existingTagIds, newTagObjects } = await checkIfTagsExists(newTaskData.tags, existingTags);
-    newTaskData.tags = existingTagIds.join(",");
-    const response = await fetch(`${API}/tasks`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newTaskData),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to add new task");
-    }
-    const newTaskResponse = await response.json();
-    const newTaskObject = {
-      id: newTaskResponse.id,
-      name: newTaskData.name,
-      tags: newTaskData.tags,
-    }
-    return { newTaskObject, newTagObjects };
-  } catch (error) {
-    console.error("Error adding task:", error);
-    throw error;
-  }
+  const { existingTagIds, newTagObjects } = await checkIfTagsExists(newTaskData.tags, existingTags);
+  newTaskData.tags = existingTagIds.join(",");
+  
+  const newTaskResponse = await apiFetch(`${API}/tasks`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(newTaskData),
+  });
+  
+  const newTaskObject = { id: newTaskResponse.id, ...newTaskData };
+  return { newTaskObject, newTagObjects };
 };
 
-// Delete task and all timestamps associated with it
+// Deletes task and all associated timestamps
 export const deleteTask = async (id, timestamps) => {
-  try {
-    const response = await fetch(`${API}/tasks/${id}`, {
-      method: "DELETE",
-    });
-    if (!response.ok) {
-      throw new Error("Failed to delete task");
-    }
-    await deleteTimestamps(id, timestamps);
-  } catch (error) {
-    console.error("Error deleting task:", error);
-    throw error;
-  }
+  await apiFetch(`${API}/tasks/${id}`, { method: "DELETE" });
+  await deleteTimestamps(id, timestamps);
 };
 
-// Delete tag and remove deleted tag from all existing tasks housing it
+// Deletes tag and updates all tasks that used that tag
 export const deleteTag = async (tagId, tasks) => {
-  try {
-    const deleteResponse = await fetch(`${API}/tags/${tagId}`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-    });
-
-    if (!deleteResponse.ok) {
-      throw new Error("Failed to delete tag");
-    }
-////CHECK IF OTHER FUNCTIONS CAN USE SAME .includes FUNCTION////////////////////////////////////////////////////////////////////////
-    // Find tasks with the id of the deleted tag
-    const tasksToUpdate = tasks.filter((task) => task.tags.includes(tagId));
-
-    for (const task of tasksToUpdate) {
-      const updatedTags = task.tags
-        .split(",")
-        .filter((id) => id !== String(tagId))
-        .join(",");
-
-      await fetch(`${API}/tasks/${task.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...task, tags: updatedTags }),
-      });
-    }
-  } catch (error) {
-    console.error("Error deleting tag or updating tasks:", error);
-    throw error;
-  }
-};
-
-export const updateTask = async (id, updatedTask, allTags) => {
-  try {
-    const { existingTagIds, newTagObjects }= await checkIfTagsExists(updatedTask.tags, allTags);
-    updatedTask.tags = existingTagIds.join(",");
-    const response = await fetch(`${API}/tasks/${id}`, {
+  await apiFetch(`${API}/tags/${tagId}`, { method: "DELETE", headers: { "Content-Type": "application/json" } });
+  
+  const tasksToUpdate = tasks.filter((task) => task.tags.includes(tagId));
+  for (const task of tasksToUpdate) {
+    const updatedTags = task.tags.split(",").filter((id) => id !== String(tagId)).join(",");
+    
+    await apiFetch(`${API}/tasks/${task.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedTask),
+      body: JSON.stringify({ ...task, tags: updatedTags }),
     });
-
-    if (!response.ok) {
-      throw new Error("Failed to update task");
-    }
-    const updatedTaskResponse = await response.json();
-    const updatedTaskObject = {
-      id: updatedTaskResponse.id,
-      name: updatedTask.name,
-      tags: updatedTask.tags
-    }
-    return { updatedTaskObject, newTagObjects };
-  } catch (error) {
-    console.error("Error updating task:", error);
-    throw error;
   }
 };
 
-export const addTimestamp = async (time, task, type) => {
-  try {
-    const response = await fetch(`${API}/timestamps`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        timestamp: time,
-        task: task,
-        type: type,
-      }),
-    });
+// Updates an existing task with new data and handles tags
+export const updateTask = async (id, updatedTask, allTags) => {
+  const { existingTagIds, newTagObjects } = await checkIfTagsExists(updatedTask.tags, allTags);
+  updatedTask.tags = existingTagIds.join(",");
+  
+  const updatedTaskResponse = await apiFetch(`${API}/tasks/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updatedTask),
+  });
 
-    if (!response.ok) {
-      throw new Error("Failed to add timestamp");
-    }
-    const newTimestampResponse = await response.json();
-    const newTimestampObject = {
-      id: newTimestampResponse.id,
-      timestamp: time,
-      task: task,
-      type: type
-    }
-    return newTimestampObject;
-  } catch (error) {
-    console.error("Error adding timestamp:", error);
-    throw error;
-  }
-}
+  const updatedTaskObject = { id: updatedTaskResponse.id, ...updatedTask };
+  return { updatedTaskObject, newTagObjects };
+};
 
+// Adds new timestamp to database
+export const addTimestamp = async (newTimestampData) => {
+  const newTimestampResponse =  await apiFetch(`${API}/timestamps`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(newTimestampData),
+  });
+  const newTimestampObject = { id: newTimestampResponse.id, ...newTimestampData };
+  return newTimestampObject;
+};
+
+// Deletes timestamps associated with a specific task
 const deleteTimestamps = async (taskId, timestamps) => {
-  for (const timestamp of timestamps) {
-    if (timestamp.task === taskId) {
-      try {
-        const response = await fetch(`${API}/timestamps/${timestamp.id}`, {
-          method: "DELETE",
-        });
-        if (!response.ok) {
-          throw new Error("Failed to delete timestamp");
-        }
-      } catch (error) {
-        console.error("Error deleting timestamp:", error);
-        throw error;
-      }
-    }
-  }
+  const deletePromises = timestamps
+    .filter(timestamp => timestamp.task === taskId)
+    .map(timestamp => apiFetch(`${API}/timestamps/${timestamp.id}`, { method: "DELETE" }));
+
+  await Promise.all(deletePromises);
 };
