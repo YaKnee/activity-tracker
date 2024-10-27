@@ -42,6 +42,11 @@ function About() {
           </thead>
           <tbody>
             <tr>
+              <td>Logo</td>
+              <td>none</td>
+              <td>Self-made</td>
+            </tr>
+            <tr>
               <td>Video</td>
               <td>___</td>
               <td><a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank">yt</a></td>
@@ -79,7 +84,7 @@ function About() {
 
       </section>
       <section>
-        <h3>Time spent: <em>8 hours</em></h3>
+        <h3>Time spent: <em>17 hours</em></h3>
       </section>
       <section>
         <h3>Most complex feature:</h3>
