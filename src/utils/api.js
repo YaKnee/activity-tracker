@@ -40,7 +40,7 @@ export const addTag = async (name) => {
 };
 
 // Checks if specified tags exist and adds any new tags to the database
-const checkIfTagsExists = async (tags, existingTags) => {
+export const checkIfTagsExists = async (tags, existingTags) => {
   const tagNames = tags.split(",").map((tag) => tag.trim());
   const existingTagIds = [];
   const newTagObjects = [];
@@ -75,7 +75,7 @@ export const addTask = async (newTaskData, existingTags) => {
   return { newTaskObject, newTagObjects };
 };
 
-// Deletes task and all associated timestamps
+// Delete task and all associated timestamps (Maybe change later so we can potentially restore task)
 export const deleteTask = async (id, timestamps) => {
   await apiFetch(`${API}/tasks/${id}`, { method: "DELETE" });
   await deleteTimestamps(id, timestamps);
