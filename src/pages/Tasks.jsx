@@ -1,19 +1,26 @@
-import { React, useState } from "react";
-import { addTask, addTag, deleteTag} from "../utils/api";
+import React, { useState, useRef } from "react";
+import { addTask, addTag} from "../utils/api";
 import { getTaskSpecificTags } from "../utils/apiDataManipulation";
 // import { Select, MenuItem, Checkbox, ListItemText, TextField, Button, 
 //   FormControl, InputLabel, OutlinedInput } from "@mui/material";
-import Chip from '@mui/material/Chip';
-import Autocomplete from '@mui/material/Autocomplete';
-import TextField from '@mui/material/TextField';
+// import Chip from '@mui/material/Chip';
+// import Autocomplete from '@mui/material/Autocomplete';
+// import TextField from '@mui/material/TextField';
 import TaskBox from "../components/TaskBox";
 import DeleteTagForm from "../components/DeleteTagForm";
+import AddTagForm from "../components/AddTagForm";
+import SnackbarAlert from "../components/alerts/SnackBarAlert";
 import "../styles/App.css";
 
 function Tasks({ tasks, setTasks, tags, setTags, timestamps, setTimestamps }) {
   const [newTaskName, setNewTaskName] = useState("");
   const [selectedTags, setSelectedTags] = useState([]);
+  const snackbarRef = useRef();
 
+  const showSnackbar = (message, severity) => {
+    snackbarRef.current.showSnackbar(message, severity)
+  }
+  // Handles the addition of a new task to the database
   const handleAddTask = async () => {
     const newTaskData = {
       name: newTaskName,
@@ -22,20 +29,29 @@ function Tasks({ tasks, setTasks, tags, setTags, timestamps, setTimestamps }) {
     try {
       const { newTaskObject, newTagObjects } = await addTask(newTaskData, tags);
       setTasks((prevTasks) => [...prevTasks, newTaskObject]);
+      // If new tags are created, update the tags state
       if (newTagObjects.length > 0) {
        setTags((prevTags) => [...prevTags, ...newTagObjects]);
       }
-      setNewTaskName("");
-      setSelectedTags([]);
+      showSnackbar("Task added successfully.", "success");
+      resetForm();
     } catch (error) {
       alert("Error adding task: ", error);
+      showSnackbar("Error adding task.", "error");
     }
   };
-  
+
+  // Resets the form fields
+  const resetForm = () => {
+    setNewTaskName("");
+    setSelectedTags("");
+  };
+
+  // Handles form submission for adding a new task
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!newTaskName || selectedTags.length === 0) {
-      alert("Please enter a task name and select at least one tag.");
+      showSnackbar("Please enter a task name and select at least one tag.", "warning");
     } else {
       await handleAddTask();
     }
@@ -84,8 +100,12 @@ function Tasks({ tasks, setTasks, tags, setTags, timestamps, setTimestamps }) {
           <button onClick={handleSubmit}>Add Task</button>
         </div>
         <div>
+          <h3>Add tags:</h3>
+          <AddTagForm tags={tags} setTags={setTags} showSnackbar={showSnackbar} />
+        </div>
+        <div>
           <h3>Delete Tags:</h3>
-          <DeleteTagForm tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags}/>
+          <DeleteTagForm tasks={tasks} setTasks={setTasks} tags={tags} setTags={setTags} showSnackbar={showSnackbar} />
         </div>
         <div className="task-grid">
           {tasks.length < 1 ? (
@@ -103,12 +123,14 @@ function Tasks({ tasks, setTasks, tags, setTags, timestamps, setTimestamps }) {
                   setTasks={setTasks}
                   setTags={setTags}
                   setTimestamps={setTimestamps}
+                  showSnackbar={showSnackbar}
                 />
               </div>
             )
           )}
         </div>
       </section>
+      <SnackbarAlert ref={snackbarRef} />
     </>
   );
 }

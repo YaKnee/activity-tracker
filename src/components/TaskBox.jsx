@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FaFilePen, FaTrashCan } from 'react-icons/fa6';
 import { deleteTask, updateTask, addTimestamp } from "../utils/api";
 import { getTaskSpecificTotalActiveTime, parseTimestampAsUTC} from "../utils/apiDataManipulation";
@@ -24,7 +24,7 @@ const initialTaskBoxState = (name, tags, timestamps) => {
   };
 };
 
-const TaskBox = ({ id, name, tags, allTags, timestamps, setTasks, setTags, setTimestamps }) => {
+const TaskBox = ({ id, name, tags, allTags, timestamps, setTasks, setTags, setTimestamps, showSnackbar }) => {
     
   const [taskBoxState, setTaskBoxState] = useState(() => initialTaskBoxState(name, tags, timestamps));
   const [isEditMode, setIsEditMode] = useState(false);
@@ -66,9 +66,13 @@ const TaskBox = ({ id, name, tags, allTags, timestamps, setTasks, setTags, setTi
       + '.' + String(now.getMilliseconds()).padStart(3, '0');
 
     const newType = taskBoxState.active ? 1 : 0;
+    const newTimestampData = {
+      timestamp: nowFormattedForPostRequest,
+      task: id,
+      type: newType
+    }
     try {
-      const newTimestampObject = 
-        await addTimestamp(nowFormattedForPostRequest, id, newType);
+      const newTimestampObject = await addTimestamp(newTimestampData);
       
       setTimestamps(prevTimestamps => [...prevTimestamps, newTimestampObject]);
 
@@ -78,8 +82,13 @@ const TaskBox = ({ id, name, tags, allTags, timestamps, setTasks, setTags, setTi
         startTime: newType === 1 ? null : now,
         endTime: newType === 1 ? now : null,
       }));
+      showSnackbar(
+        `Task ${newType === 1 ? "stopped" : "started"} successfully.`,
+        "info"
+      );
     } catch (error) {
       console.error("Error toggling task active state:", error);
+      showSnackbar("An error occurred while toggling the task's active state.","error");
     }
   };
 
@@ -92,8 +101,10 @@ const TaskBox = ({ id, name, tags, allTags, timestamps, setTasks, setTags, setTi
     try {
       await deleteTask(id, timestamps);
       setTasks(prevTasks => prevTasks.filter(task => task.id !== id));
+      showSnackbar("Task deleted successfully.", "success");
     } catch (error) {
       console.error("Error deleting task:", error);
+      showSnackbar("Error deleting task. Please try again.", "error");
     }
   };
 
@@ -122,10 +133,10 @@ const TaskBox = ({ id, name, tags, allTags, timestamps, setTasks, setTags, setTi
           name: updatedTaskObject.name,
           tags: editState.tags,
         }));
-  
-  
+        showSnackbar("Task updated successfully.", "success");
       } catch (error) {
         console.error("Error updating task:", error);
+        showSnackbar("Error updating task. Please try again.", "error");
       }
     } 
     handleCancelClick(); // Exit edit mode
@@ -154,59 +165,61 @@ const TaskBox = ({ id, name, tags, allTags, timestamps, setTasks, setTags, setTi
   };
   
   return (
-    <table>
-      <tbody>
-        <tr>
-          <th>Name:</th>
-          <td>
-            {isEditMode ? <input name="name" type="text" value={editState.name} onChange={handleInputChange} />
-                        : taskBoxState.name}
-          </td>
-        </tr>
-        <tr>
-          <th>Tags:</th>
-          <td>
-            {isEditMode ? <input name="tags" type="text" value={editState.tags} onChange={handleInputChange} />
-                        : taskBoxState.tags}
-          </td>
-        </tr>
-        <tr>
-          <th>Start Time:</th>
-          <td>{taskBoxState.active ? taskBoxState.startTime.toLocaleString() : "N/A"}</td>
-        </tr>
-        <tr>
-          <th>End Time:</th>
-          <td>{taskBoxState.active ? "N/A" : (timestamps.length > 0 ? taskBoxState.endTime.toLocaleString() : "N/A")}</td>
-        </tr>
-        <tr>
-          <th>Total Duration:</th>
-          <td>{formatDuration(taskBoxState.totalActiveDuration)}</td>
-        </tr>
-        <tr>
-          <td colSpan="2">
-            <div className="task-buttons">
-              <div className="left-buttons">
-                {!isEditMode ? (
-                  <button className="edit-button" onClick={handleEditClick}><FaFilePen /></button>
-                ) : (
-                  <>
-                    <button className="confirm-button" onClick={handleConfirmClick}>Confirm</button>
-                    <button className="cancel-button" onClick={handleCancelClick}>Cancel</button>
-                  </>
-                )}
-                <button
-                  className={`toggle-button ${taskBoxState.active ? "active" : "inactive"}`}
-                  onClick={toggleActive}
-                >
-                  {taskBoxState.active ? "Active" : "Inactive"}
-                </button>
+    <>
+      <table>
+        <tbody>
+          <tr>
+            <th>Name:</th>
+            <td>
+              {isEditMode ? <input name="name" type="text" value={editState.name} onChange={handleInputChange} />
+                          : taskBoxState.name}
+            </td>
+          </tr>
+          <tr>
+            <th>Tags:</th>
+            <td>
+              {isEditMode ? <input name="tags" type="text" value={editState.tags} onChange={handleInputChange} />
+                          : taskBoxState.tags}
+            </td>
+          </tr>
+          <tr>
+            <th>Start Time:</th>
+            <td>{taskBoxState.active ? taskBoxState.startTime.toLocaleString() : "N/A"}</td>
+          </tr>
+          <tr>
+            <th>End Time:</th>
+            <td>{taskBoxState.active ? "N/A" : (timestamps.length > 0 ? taskBoxState.endTime.toLocaleString() : "N/A")}</td>
+          </tr>
+          <tr>
+            <th>Total Duration:</th>
+            <td>{formatDuration(taskBoxState.totalActiveDuration)}</td>
+          </tr>
+          <tr>
+            <td colSpan="2">
+              <div className="task-buttons">
+                <div className="left-buttons">
+                  {!isEditMode ? (
+                    <button className="edit-button" onClick={handleEditClick}><FaFilePen /></button>
+                  ) : (
+                    <>
+                      <button className="confirm-button" onClick={handleConfirmClick}>Confirm</button>
+                      <button className="cancel-button" onClick={handleCancelClick}>Cancel</button>
+                    </>
+                  )}
+                  <button
+                    className={`toggle-button ${taskBoxState.active ? "active" : "inactive"}`}
+                    onClick={toggleActive}
+                  >
+                    {taskBoxState.active ? "Active" : "Inactive"}
+                  </button>
+                </div>
+                {isEditMode && <button className="delete-button" onClick={handleDeleteClick}><FaTrashCan /></button>}
               </div>
-              {isEditMode && <button className="delete-button" onClick={handleDeleteClick}><FaTrashCan /></button>}
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </>
   );
 };
 

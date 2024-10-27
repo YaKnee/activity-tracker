@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from 'react';
+import { React, useState, useRef } from 'react';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -21,10 +21,10 @@ const MenuProps = {
   },
 };
 
-export default function DeleteTagForm({ tasks, setTasks, tags, setTags }) {
+export default function DeleteTagForm({ tasks, setTasks, tags, setTags, showSnackbar }) {
   // Extract tag names with IDs for easier access
   const [selectedTags, setSelectedTags] = useState([]);
-  
+
   const handleChange = (event) => {
     const { target: { value } } = event;
     setSelectedTags(
@@ -33,17 +33,16 @@ export default function DeleteTagForm({ tasks, setTasks, tags, setTags }) {
   };
 
   const handleDelete = async () => {
+    if (selectedTags.length === 0) {
+      showSnackbar("No tags selected for deletion.", "warning");
+      return;
+    }
     try {
       for (const tag of selectedTags) {
         const tagObject = tags.find(t => t.name === tag);
         if (tagObject) {
-          // Delete the tag by ID in the backend
           await deleteTag(tagObject.id, tasks);
-  
-          // Update tags state: filter out the deleted tag and create a new array
           setTags(prevTags => [...prevTags.filter(t => t.id !== tagObject.id)]);
-  
-          // Update tasks state: create a new array with updated tasks
           setTasks(prevTasks =>
             prevTasks.map(task => ({
               ...task,
@@ -53,14 +52,13 @@ export default function DeleteTagForm({ tasks, setTasks, tags, setTags }) {
                 .join(','),
             }))
           );
-            alert(`Tag ${tagObject.id} was deleted.`)
         }
       }
-  
-      // Reset selection after deletion
+      showSnackbar("Selected tags were deleted.", "success");
       setSelectedTags([]);
     } catch (error) {
       console.error("Error deleting tag:", error);
+      showSnackbar("Error deleting tags. Please try again.", "error");
     }
   };
 
