@@ -4,8 +4,8 @@ import { deleteTask, updateTask, addTimestamp } from "../utils/api";
 import { getTagNames, getTotalActiveTimeOfTask, parseTimestampAsUTC} from "../utils/apiDataManipulation";
 import "../styles/App.css";
 
-const getInitialTaskState = (name, tags, allTags, timestamps) => {
-  const tagNames = getTagNames(tags, allTags);
+const getTaskState = (name, tags, timestamps) => {
+
   const totalActiveTime = getTotalActiveTimeOfTask(timestamps);
   const lastTimestamp = timestamps.length > 0 ? timestamps[timestamps.length - 1] : null;
   const isActive = lastTimestamp ? lastTimestamp.type === 1 : false;
@@ -16,7 +16,7 @@ const getInitialTaskState = (name, tags, allTags, timestamps) => {
 
   return {
     name,
-    tags: tagNames,
+    tags: tags,
     active: isActive,
     startTime: isActive ? parseTimestampAsUTC(lastTimestamp.timestamp) : null,
     endTime: isActive ? null : (lastTimestamp ? parseTimestampAsUTC(lastTimestamp.timestamp) : null),
@@ -24,22 +24,21 @@ const getInitialTaskState = (name, tags, allTags, timestamps) => {
   };
 };
 
-const TaskBox = ({ id, name, tags, allTags, timestamps, setTasks, setTimestamps }) => {
+const TaskBox = ({ id, name, tags, allTags, timestamps, setTasks, setTags, setTimestamps }) => {
     
-  const [taskState, setTaskState] = useState(() => getInitialTaskState(name, tags, allTags, timestamps));
+  const [taskState, setTaskState] = useState(() => getTaskState(name, tags, timestamps));
 
   const [isEditMode, setIsEditMode] = useState(false);
 
   const [editState, setEditState] = useState({ name: taskState.name, tags: taskState.tags });
 
   useEffect(() => {
-    setTaskState(getInitialTaskState(name, tags, allTags, timestamps));
-  }, [name, tags, allTags, timestamps]);
-  
-  useEffect(() => {
     setEditState({ name: taskState.name, tags: taskState.tags });
   }, [taskState.name, taskState.tags]);
-
+  
+  useEffect(() => {
+    setTaskState(prev => ({ ...prev, tags: getTagNames(tags, allTags) }));
+  }, [tags, allTags]);
 
   // Update totalActiveDuration every second if the task is active
   useEffect(() => {
@@ -64,16 +63,10 @@ const TaskBox = ({ id, name, tags, allTags, timestamps, setTasks, setTimestamps 
 
     const newType = taskState.active ? 0 : 1;
     try {
-      const newTimestampId = 
+      const newTimestampObject = 
         await addTimestamp(nowFormattedForPostRequest, id, newType);
       
-      const newTimestamp = {
-        id: newTimestampId.id,
-        timestamp: nowFormattedForPostRequest,
-        task: id,
-        type: newType,
-      };
-      setTimestamps(prevTimestamps => [...prevTimestamps, newTimestamp]);
+      setTimestamps(prevTimestamps => [...prevTimestamps, newTimestampObject]);
 
       setTaskState(prevState => ({
         ...prevState,
@@ -116,23 +109,29 @@ const TaskBox = ({ id, name, tags, allTags, timestamps, setTasks, setTimestamps 
   };
 
   const handleConfirmClick = async () => {
-    try {
-      const updatedTaskData = {
-        name: editState.name,
-        tags: editState.tags,
-      };
-
-      const updatedTask = await updateTask(id, updatedTaskData, allTags); 
-      setTasks(prevTasks => prevTasks.map(task => (task.id === id ? updatedTask : task)));
-      setTaskState(prevState => ({
-        ...prevState,
-        name: updatedTask.name,
-        tags: getTagNames(updatedTask.tags, allTags),
-      }));
-      setIsEditMode(false);
-    } catch (error) {
-      console.error("Error updating task:", error);
-    }
+    if (editState.name !== taskState.name || editState.tags !== taskState.tags) {
+      try {
+        const updatedTaskData = {
+          name: editState.name,
+          tags: editState.tags,
+        };
+        const { updatedTaskObject, newTagObjects } = await updateTask(id, updatedTaskData, allTags); 
+        if (newTagObjects.length > 0) {
+          setTags((prevTags) => [...prevTags, ...newTagObjects])
+        }
+        setTasks(prevTasks => prevTasks.map(task => (task.id === id ? updatedTaskObject : task)));
+        setTaskState(prevState => ({
+          ...prevState,
+          name: updatedTaskObject.name,
+          tags: getTagNames(updatedTaskObject.tags, allTags),
+        }));
+  
+  
+      } catch (error) {
+        console.error("Error updating task:", error);
+      }
+    } 
+    handleCancelClick();
   };
 
   //NEEDED?
@@ -140,7 +139,7 @@ const TaskBox = ({ id, name, tags, allTags, timestamps, setTasks, setTimestamps 
     const { name, value } = e.target;
     setEditState(prevState => ({
       ...prevState,
-      [name]: name === "tags" ? value.split(",").map(tag => tag.trim()).join(",") : value,
+      [name]: value,
     }));
   };
 
