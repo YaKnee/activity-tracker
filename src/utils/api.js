@@ -155,14 +155,11 @@ export const deleteTag = async (tagId, tasks) => {
 export const updateTask = async (id, updatedTask, allTags) => {
   try {
     const { existingTagIds, newTagObjects }= await checkIfTagsExists(updatedTask.tags, allTags);
-    // Copy the object so as not to manipulate original data
-    const updatedTaskCopy = {...updatedTask};
-    updatedTaskCopy.tags = existingTagIds.join(",");
-
+    updatedTask.tags = existingTagIds.join(",");
     const response = await fetch(`${API}/tasks/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedTaskCopy),
+      body: JSON.stringify(updatedTask),
     });
 
     if (!response.ok) {
