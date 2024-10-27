@@ -1,6 +1,6 @@
 import { React, useState } from "react";
 import { addTask, addTag, deleteTag} from "../utils/api";
-import { getTagNames } from "../utils/apiDataManipulation";
+import { getTaskSpecificTags } from "../utils/apiDataManipulation";
 // import { Select, MenuItem, Checkbox, ListItemText, TextField, Button, 
 //   FormControl, InputLabel, OutlinedInput } from "@mui/material";
 import Chip from '@mui/material/Chip';
@@ -91,13 +91,13 @@ function Tasks({ tasks, setTasks, tags, setTags, timestamps, setTimestamps }) {
           {tasks.length < 1 ? (
             <h3>No tasks yet.</h3>
           ) : (
-            tasks.map(task =>
+            tasks.map(task => 
               <div key={`container-${task.id}`} className="task-container">
                 <TaskBox
                   key={task.id}
                   id={task.id}
                   name={task.name}
-                  tags={getTagNames(task.tags, tags)}
+                  tags={getTaskSpecificTags(task, tags)}
                   allTags={tags}
                   timestamps={timestamps.filter((t) => t.task === task.id)}
                   setTasks={setTasks}
