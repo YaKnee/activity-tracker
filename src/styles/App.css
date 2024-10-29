@@ -14,7 +14,7 @@ html, body {
   flex-direction: column;
 }
 
-nav {
+/* nav {
   background-color: #000366;
   border-bottom: 2px solid white;
   position: fixed;
@@ -31,21 +31,22 @@ nav a{
   border: 1px solid #767676;
   background-color: #333;
   font-size: 2rem;
-}
+} */
 
 article{
-  margin-top: 50px;
+  /* margin-top: 50px; */
   flex-grow: 1;
 }
 
-section::after, section::before {
+/* Add after again? */
+section::before { 
   content: "";
   display: block;
   width: 100%;
   height: 2px;
   background-color: rgb(71, 71, 165);
   margin-top: 10px;
-  clear: both;
+  /* clear: both; */
 }
 
 #copyright{
@@ -53,11 +54,31 @@ section::after, section::before {
   width: 100%;
   bottom: 0;
 }
+/* footer p {
+  width: 100%;
+  color: white;
+  text-align: center;
+} */
 
 .outline-text{
   color: white;
   background-color: white;
   text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+.active {
+  background-color: rgb(107, 230, 107);
+}
+.active:hover{
+  background-color: rgb(51, 185, 51) !important;
+}
+.inactive {
+  background-color: rgb(255, 64, 64); 
+}
+.inactive:hover {
+  background-color: red !important;
+}
+.inactive:focus{
+  background-color: rgb(186, 0, 0) !important;
 }
 /*======================================Tasks=================================*/
 .task-grid {
@@ -71,6 +92,7 @@ section::after, section::before {
   margin: 1em;
   background-color: #767676;
   border: 1px solid rgb(212, 212, 212);
+  box-shadow: 0 2px 5px 2px black;
   border-radius: 5px;
 }
 
@@ -102,11 +124,6 @@ section::after, section::before {
   color: #555;
 }
 
-.task-container label {
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-}
 
 .task-buttons{
   display: flex;
@@ -114,11 +131,7 @@ section::after, section::before {
   align-items: center;
   width: 100%;
 }
-.left-buttons {
-  display: flex;
-  justify-content: center;
-  flex-grow: 1;
-}
+
 .task-buttons button{
   margin: 0 4px;
   flex: 1;
@@ -127,33 +140,7 @@ section::after, section::before {
   border: 1px solid black;
 }
 
-.toggle-button {
-  transition: background-color 0.3s;
-}
-.active {
-  background-color: green;
-}
-.inactive {
-  background-color: red; 
-}
-.toggle-button:hover{
-  transform: scale(1.05);
-}
 
-.edit-button {
-  background-color: rgb(28, 28, 158);
-  max-width: 25%;
-}
-.confirm-button {
-  background-color: rgb(37, 173, 37);
-}
-.delete-button{
-  background-color :#333;
-  max-width: 20%;
-}
-.cancel-button{
-  background-color: #767676;
-}
 /*====================================Settings================================*/
 #theme-button-light{
   background-color: white;
