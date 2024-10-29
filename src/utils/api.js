@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 const API = "http://localhost:3010";
 
 // Generic fetch function to handle API requests
@@ -58,7 +60,20 @@ export const checkIfTagsExists = async (tags, existingTags) => {
   return { existingTagIds, newTagObjects };
 };
 
-// Adds new task to the database, updating tags if necessary
+// Adds new timestamp to database
+export const addTimestamp = async (newTimestampData) => {
+  const newTimestampResponse = await apiFetch(`${API}/timestamps`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(newTimestampData),
+  });
+  const newTimestampObject = { id: newTimestampResponse.id, ...newTimestampData };
+  return newTimestampObject;
+};
+
+// Adds new task to the database, updating tags if necessary, and create a timestamp of this creation
 export const addTask = async (newTaskData, existingTags) => {
   const { existingTagIds, newTagObjects } = await checkIfTagsExists(newTaskData.tags, existingTags);
   newTaskData.tags = existingTagIds.join(",");
@@ -70,15 +85,46 @@ export const addTask = async (newTaskData, existingTags) => {
     },
     body: JSON.stringify(newTaskData),
   });
-  
+  // Create a timestamp for this new task
+  const taskTimeOfCreation = {
+    timestamp: new Date(),
+    task: newTaskResponse.id,
+    type: 1
+  };
+  const newTimestampObject = await addTimestamp(taskTimeOfCreation);
+
   const newTaskObject = { id: newTaskResponse.id, ...newTaskData };
-  return { newTaskObject, newTagObjects };
+  return { newTaskObject, newTagObjects, newTimestampObject };
+};
+
+// Updates an existing task with new data and handles tags
+export const updateTask = async (id, updatedTask, allTags) => {
+  const { existingTagIds, newTagObjects } = await checkIfTagsExists(updatedTask.tags, allTags);
+  updatedTask.tags = existingTagIds.join(",");
+  
+  const updatedTaskResponse = await apiFetch(`${API}/tasks/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updatedTask),
+  });
+
+  const updatedTaskObject = { id: updatedTaskResponse.id, ...updatedTask };
+  return { updatedTaskObject, newTagObjects };
 };
 
 // Delete task and all associated timestamps (Maybe change later so we can potentially restore task)
 export const deleteTask = async (id, timestamps) => {
   await apiFetch(`${API}/tasks/${id}`, { method: "DELETE" });
   await deleteTimestamps(id, timestamps);
+};
+
+// Deletes timestamps associated with a specific task
+const deleteTimestamps = async (taskId, timestamps) => {
+  const deletePromises = timestamps
+    .filter(timestamp => timestamp.task === taskId)
+    .map(timestamp => apiFetch(`${API}/timestamps/${timestamp.id}`, { method: "DELETE" }));
+
+  await Promise.all(deletePromises);
 };
 
 // Deletes tag and updates all tasks that used that tag
@@ -97,39 +143,8 @@ export const deleteTag = async (tagId, tasks) => {
   }
 };
 
-// Updates an existing task with new data and handles tags
-export const updateTask = async (id, updatedTask, allTags) => {
-  const { existingTagIds, newTagObjects } = await checkIfTagsExists(updatedTask.tags, allTags);
-  updatedTask.tags = existingTagIds.join(",");
-  
-  const updatedTaskResponse = await apiFetch(`${API}/tasks/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(updatedTask),
-  });
-
-  const updatedTaskObject = { id: updatedTaskResponse.id, ...updatedTask };
-  return { updatedTaskObject, newTagObjects };
-};
-
-// Adds new timestamp to database
-export const addTimestamp = async (newTimestampData) => {
-  const newTimestampResponse =  await apiFetch(`${API}/timestamps`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(newTimestampData),
-  });
-  const newTimestampObject = { id: newTimestampResponse.id, ...newTimestampData };
-  return newTimestampObject;
-};
-
-// Deletes timestamps associated with a specific task
-const deleteTimestamps = async (taskId, timestamps) => {
-  const deletePromises = timestamps
-    .filter(timestamp => timestamp.task === taskId)
-    .map(timestamp => apiFetch(`${API}/timestamps/${timestamp.id}`, { method: "DELETE" }));
-
-  await Promise.all(deletePromises);
-};
+// Fetch timestamps for specific tasks
+export const fetchTimesPerTask = async (taskId) => {
+  const result = await apiFetch(`${API}/timesfortask/${taskId}`);
+  return result;
+}
