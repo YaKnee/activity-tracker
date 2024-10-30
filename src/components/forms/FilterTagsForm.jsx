@@ -4,7 +4,6 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import AutoCompleteTagsForm from "./AutoCompleteTagsForm";
@@ -24,7 +23,7 @@ function FilterTagsForm({ allTags, setFilteredTags }) {
   };
   const handleClear = () => {
     setFilteredTags([])
-    setSelectedTags([]);
+    setSelectedTags([]); //Remove this since we set lastConfirmed in Close
     setLastConfirmedTags([]);
     setHasFiltered(false);
     handleClose();

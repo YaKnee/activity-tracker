@@ -2,12 +2,15 @@ import React, { useState } from "react";
 import AddTaskOrTagsForm from "../components/forms/AddTaskOrTagsForm";
 import DeleteTagForm from "../components/forms/DeleteTagForm";
 import FilterTagsForm from "../components/forms/FilterTagsForm";
+import SortTasksForm from "../components/forms/SortTasksForm";
 import TaskElement from "../components/TaskElement";
 import "../styles/App.css";
 
 function TasksView({ tasks, setTasks, tags, setTags, timestamps, setTimestamps, showSnackbar }) {
 
   const [filteredTags, setFilteredTags] = useState([]);
+  const [sortedTasks, setSortedTasks] = useState([]);
+  const [taskStates, setTaskStates] = useState([]);
 
   const getFilteredTasks = () => {
     if (filteredTags.length > 0 && filteredTags[0] !== null) {
@@ -42,7 +45,7 @@ function TasksView({ tasks, setTasks, tags, setTags, timestamps, setTimestamps, 
             showSnackbar={showSnackbar} 
           />
         </div>
-
+        <SortTasksForm taskStates={taskStates} setTaskStates={setTaskStates} sortedTasks={sortedTasks} setSortedTasks={setSortedTasks} />
         <FilterTagsForm allTags={tags} setFilteredTags={setFilteredTags}/>
         <div className="task-grid">
           { tasks.length < 1 ? (
@@ -64,6 +67,8 @@ function TasksView({ tasks, setTasks, tags, setTags, timestamps, setTimestamps, 
                   setTasks={setTasks}
                   setTags={setTags}
                   setTimestamps={setTimestamps}
+                  taskStates={taskStates}
+                  setTaskStates={setTaskStates}
                   showSnackbar={showSnackbar}
                 />
               </div>

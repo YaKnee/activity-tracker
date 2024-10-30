@@ -2,8 +2,8 @@
 React project to track activity
 
 ## Requirements
-- [] (•	The submission has been done as a .zip package. When unzipped into a directory, this directory should work directly as the project directory. (This means that you should zip the relevant content of your project directory into a zip file, not add your project directory into a zip file so that when unzipped into a directory, there is your project directory within this directory.)
-- [] (•	The application has at least three separate “views” with different content, and the user is able to keep switching between the views easily using a menu (a dropdown menu or a menu bar), tabs, or buttons within the user interface of the application.)
+- [ ] (•	The submission has been done as a .zip package. When unzipped into a directory, this directory should work directly as the project directory. (This means that you should zip the relevant content of your project directory into a zip file, not add your project directory into a zip file so that when unzipped into a directory, there is your project directory within this directory.)
+- [ ] (•	The application has at least three separate “views” with different content, and the user is able to keep switching between the views easily using a menu (a dropdown menu or a menu bar), tabs, or buttons within the user interface of the application.)
     •	The application has an “Info” (or “About”) menu option or button, via which the user can get information on the application. At least these pieces of information must be available via this functionality:
     •	The name of the author
     •	Short instructions for using the application. If instructions are unnecessary – i.e., you are sure that your UI is extremely easy to use and understandable intuitively – this state of matters must be mentioned explicitly, then. (The info can contain, e.g., the statement “The UI hints help the user to figure out how to use the application,” “Using the application should be intuitive and straightforward,” or something else suitable.)
@@ -28,7 +28,7 @@ React project to track activity
     •	remove task elements one by one in an arbitrary order.
     (A task element is a visual representation of a task known by the application, and adding and removing task elements can be seen as adding and removing the corresponding (abstract) tasks from the system.))
 
-- [ ](    •	Via the application UI, the user is also able to...
+- [ ] (    •	Via the application UI, the user is also able to...
     •	freely edit the task names shown in the task elements,
     •	add tags to and remove them from task elements arbitrarily one by one, and
     •	create new tags (by defining arbitrary strings – possibly along with some additional data that might be needed (e.g., presentation color) – to be used as such).

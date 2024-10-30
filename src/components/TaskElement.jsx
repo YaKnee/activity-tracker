@@ -3,8 +3,6 @@ import Button from "@mui/material/Button";
 import NoteAltIcon from '@mui/icons-material/NoteAlt';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
 import dayjs from "dayjs";
 import { deleteTask, updateTask, addTimestamp } from "../utils/api";
 import { getTagNames, getTaskSpecificTotalActiveTime} from "../utils/apiDataManipulation";
@@ -27,16 +25,30 @@ const initialTaskElementState = (name, tags, timestamps, allTags) => {
   };
 };
 
-const TaskElement = ({ id, name, tags, allTags, timestamps, setTasks, setTags, setTimestamps, showSnackbar }) => {
+const TaskElement = ({ id, name, tags, allTags, timestamps, setTasks, setTags, setTimestamps, taskStates, setTaskStates, showSnackbar }) => {
   
   //const [localTimeStamps, setLocalTimeStamps] = useState([])
   const [taskElementState, setTaskElementState] = useState(() => initialTaskElementState(name, tags, timestamps, allTags));
   const [isEditMode, setIsEditMode] = useState(false);
   const [editState, setEditState] = useState({ name: taskElementState.name, tags: taskElementState.tags });
-  const [selectedTags, setSelectedTags] = useState([]);
 
 
-  //Updates task tags in the display when tags change in the database
+  // Update parent task states manager whenever something changes here
+  useEffect(() => {
+    setTaskStates((prevStates) => {
+      const index = prevStates.findIndex((state) => state.id === id);
+      if (index === -1) {
+        return [...prevStates, { id, ...taskElementState }];
+      }
+      return [
+        ...prevStates.slice(0, index),
+        { ...prevStates[index], ...taskElementState },
+        ...prevStates.slice(index + 1),
+      ];
+    });
+  }, [taskElementState.active, taskElementState.tags, taskElementState.name]);
+
+  // Updates tags in the UI when they change in the database
   useEffect(() => {
     setTaskElementState(prevState => ({
       ...prevState,

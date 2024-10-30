@@ -84,7 +84,7 @@ function About() {
 
       </section>
       <section>
-        <h3>Time spent: <em>17 hours</em></h3>
+        <h3>Time spent: <em>27 hours</em></h3>
       </section>
       <section>
         <h3>Most complex feature:</h3>

@@ -11,7 +11,8 @@ export const getTagNames = (tagsString, allTags) => {
     const tagObject = allTags.find(tag => tag.id === tagId);
     return tagObject.name;
   })
-  return tagNames.join(", ");
+  const sortedTagNames = tagNames.sort();
+  return sortedTagNames.join(", ");
 }
 
 export const getLastTimestampForSpecificTask = async () => {
