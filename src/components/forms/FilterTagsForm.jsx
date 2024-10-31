@@ -9,6 +9,7 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import AutoCompleteTagsForm from "./AutoCompleteTagsForm";
 
 function FilterTagsForm({ allTags, setFilteredTags }) {
+
   const [isFiltering, setIsFiltering] = useState(false);
   const [selectedTags, setSelectedTags] = useState([]);
   const [lastConfirmedTags, setLastConfirmedTags] = useState([]);
@@ -18,32 +19,28 @@ function FilterTagsForm({ allTags, setFilteredTags }) {
     setIsFiltering(true);
   };
   const handleClose = () => {
-    setSelectedTags(lastConfirmedTags)
+    setSelectedTags(lastConfirmedTags);
     setIsFiltering(false);
   };
   const handleClear = () => {
-    setFilteredTags([])
-    setSelectedTags([]); //Remove this since we set lastConfirmed in Close
+    setFilteredTags([]);
     setLastConfirmedTags([]);
+    setSelectedTags([]);
     setHasFiltered(false);
-    handleClose();
-  }
+    setIsFiltering(false);
+  };
   const handleSubmit = () => {
     if (selectedTags.length > 0) {
-      // Set the filteredTags to the selected tag IDs
-      setFilteredTags(selectedTags.map(tag => allTags.find(t => t.name === tag).id));
-      // Set lastConfirmedTags to the selected tag names
-      setLastConfirmedTags(selectedTags.map(tag => allTags.find(t => t.name === tag).name));
+      setFilteredTags(selectedTags);
+      setLastConfirmedTags(selectedTags);
       setHasFiltered(true);
     } else {
       // If no tags selected, filter for tasks without tags
-      setSelectedTags([])
-      setFilteredTags([null]);
-      setHasFiltered(true)
+      setFilteredTags(["noTags"]);
+      setHasFiltered(true);
     }
     setIsFiltering(false);
   };
-
 
   return (
     <>
@@ -52,7 +49,6 @@ function FilterTagsForm({ allTags, setFilteredTags }) {
         color={hasFiltered ? "warning" : "primary"}
         startIcon={<FilterListIcon />}
         onClick={handleOpen}
-        style={{ marginTop: "10px" }}
       >
         {hasFiltered ? "Filtered" : "Filter"}
       </Button>
@@ -61,25 +57,40 @@ function FilterTagsForm({ allTags, setFilteredTags }) {
         <DialogContent>
           <DialogContentText className="mb-4">
             Only tasks that have all of these selected tags will be displayed.
-            If you press "Filter" without selecting any tags,
-            all tasks without tags will be displayed. Pressing "Clear Filters" 
-            will reset these filters and show all existing tasks again.
+            If you press "Filter" without selecting any tags, all tasks without
+            tags will be displayed. Pressing "Clear Filters" will reset these
+            filters and show all existing tasks again.
           </DialogContentText>
-          <AutoCompleteTagsForm 
-                tags={allTags}
-                selectedTags={selectedTags}
-                setSelectedTags={setSelectedTags}
-                autoHighlight={true}
-                freeSolo={false}
-              />
+          <AutoCompleteTagsForm
+            tags={allTags}
+            selectedTags={selectedTags}
+            setSelectedTags={setSelectedTags}
+            autoHighlight={true}
+            freeSolo={false}
+            label="Select Tags"
+          />
         </DialogContent>
-        <DialogActions style={{justifyContent: "space-between"}}>
-          <Button variant="contained" className="p-1" onClick={handleClear}>Clear Filters</Button>
+        <DialogActions style={{ justifyContent: "space-between" }}>
+          <Button variant="contained" className="p-1" onClick={handleClear}>
+            Clear Filters
+          </Button>
           <div>
-            <Button variant="contained" className="p-1 mx-1" onClick={handleClose}>Cancel</Button>
-            <Button variant="contained" color="success" className="p-1" onClick={handleSubmit}>Filter</Button>
+            <Button
+              variant="contained"
+              className="p-1 mx-1"
+              onClick={handleClose}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              color="success"
+              className="p-1"
+              onClick={handleSubmit}
+            >
+              Filter
+            </Button>
           </div>
-
         </DialogActions>
       </Dialog>
     </>

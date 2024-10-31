@@ -9,7 +9,7 @@ import Button from '@mui/material/Button';
 import AutoCompleteTagsForm from './AutoCompleteTagsForm';
 import { deleteTag } from '../../utils/api';
 
-export default function DeleteTagForm({ tasks, setTasks, tags, setTags, showSnackbar }) {
+export default function DeleteTagForm({ tasks, setTasks, tags, setTags, taskStates, setTaskStates, showSnackbar }) {
   const [selectedTags, setSelectedTags] = useState([]);
 
   const handleDeleteTag = async () => {
@@ -19,24 +19,39 @@ export default function DeleteTagForm({ tasks, setTasks, tags, setTags, showSnac
     }
 
     try {
+      // Store successful deletion results
+      const deletedTags = [];
+
+      // Attempt to delete each selected tag
       for (const tag of selectedTags) {
         const tagObject = tags.find(t => t.name === tag);
         if (tagObject) {
           await deleteTag(tagObject.id, tasks);
-          setTags(prevTags => prevTags.filter(t => t.id !== tagObject.id));
-          setTasks(prevTasks =>
-            prevTasks.map(task => ({
-              ...task,
-              tags: task.tags
-                .split(',')
-                .filter(tagId => tagId !== String(tagObject.id))
-                .join(','),
-            }))
-          );
+          deletedTags.push(tagObject.id);
         }
       }
+
+      const updatedTags = tags.filter(t => !deletedTags.includes(t.id));
+
+      const updatedTasks = tasks.map(task => ({
+        ...task,
+        tags: task.tags
+          .split(',')
+          .filter(tagId => !deletedTags.includes(Number(tagId)))
+          .join(','),
+      }));
+
+      const updatedTaskStates = taskStates.map(state => ({
+        ...state,
+        tags: state.tags.filter(t => !selectedTags.includes(t))
+      }));
+
+      setTags(updatedTags);
+      setTasks(updatedTasks);
+      setTaskStates(updatedTaskStates);
+
       showSnackbar("Selected tags were deleted", "success");
-      setSelectedTags([]);
+      setSelectedTags([]); // Clear the selection after deletion
     } catch (error) {
       console.error("Error deleting tag:", error);
       showSnackbar("Error deleting tags. Please try again", "error");
@@ -44,7 +59,7 @@ export default function DeleteTagForm({ tasks, setTasks, tags, setTags, showSnac
   };
 
   return (
-    <Container fluid>
+    <Container fluid as="section">
       <Row>
         <Col sm={10}>
           <AutoCompleteTagsForm 
@@ -52,7 +67,9 @@ export default function DeleteTagForm({ tasks, setTasks, tags, setTags, showSnac
             selectedTags={selectedTags}
             setSelectedTags={setSelectedTags}
             autoHighlight={true}
+            autoComplete={true}
             freeSolo={false}
+            label="Select Tags to Delete"
            />
         </Col>
         <Col sm={2}>

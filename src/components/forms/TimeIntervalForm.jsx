@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { MobileDateTimePicker } from '@mui/x-date-pickers/MobileDateTimePicker';
 
 function TimeIntervalForm({ timeRange, setTimeRange }) {
     const [startValue, setStartValue] = useState(dayjs(timeRange.start));
@@ -39,13 +39,13 @@ function TimeIntervalForm({ timeRange, setTimeRange }) {
     return (
         <div style={{ display: "flex", flexDirection: "row", margin: "10px 0", justifyContent: "center" }}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DateTimePicker
+                <MobileDateTimePicker
                     label="Start Time"
                     value={startValue}
                     onChange={handleStartChange} // Update start time and timeRange
                     // You can set minDateTime and maxDateTime here if needed
                 />
-                <DateTimePicker
+                <MobileDateTimePicker
                     label="End Time"
                     value={endValue}
                     onChange={handleEndChange} // Update end time and timeRange

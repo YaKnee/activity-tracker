@@ -13,28 +13,38 @@ html, body {
   display: flex;
   flex-direction: column;
 }
-
-/* nav {
-  background-color: #000366;
-  border-bottom: 2px solid white;
-  position: fixed;
-  top: 0;
-  width: 100%;
-  padding: 5px;
-  z-index: 999;
+.nav-icons {
+  margin-top: -5px;
 }
-nav a{
-  height: 100%;
-  margin: 0 5px;
-  padding: 5px;
+.nav-drop-items {
+  display: flex;
+  text-align: right;
+}
+.nav-drop-items > .nav-icons {
+  margin-top: 0;
+  margin-right: 5px;
+}
+.nav-link {
+  padding-right: 10px;
   border-radius: 5px;
-  border: 1px solid #767676;
-  background-color: #333;
-  font-size: 2rem;
-} */
+}
+.nav-link:hover {
+  background-color: #00000056;
+  transition: 0.2s;
+}
+@media (max-width: 992px) {
+  .dropdown-item {
+    text-align: right !important;
+  }
+  .nav-drop-items {
+    flex-direction: row-reverse;
+  }
+  .nav-drop-items > .nav-icons {
+    margin-left: 5px;
+  }
+}
 
 article{
-  /* margin-top: 50px; */
   flex-grow: 1;
 }
 
@@ -54,11 +64,8 @@ section::before {
   width: 100%;
   bottom: 0;
 }
-/* footer p {
-  width: 100%;
-  color: white;
-  text-align: center;
-} */
+
+
 
 .outline-text{
   color: white;
@@ -82,8 +89,10 @@ section::before {
 }
 /*======================================Tasks=================================*/
 .task-grid {
-  max-height: 100vh;
+  min-height: 80vh;
+  max-height: 150vh;
   overflow-y: auto;
+  /* scrollbar-color: #1976D2 #767676;  */
   display: flex; 
   flex-flow: wrap;
   justify-content: center;
@@ -114,23 +123,31 @@ section::before {
 
 .task-container th {
   text-align: center;
-  padding: 0 5px;
+  /* padding: 0 5px; */
   font-weight: bold;
   color: #333;
+  background-color: #0000001d;
 }
 
 .task-container td {
   padding: 8px 0;
+  /* max-height: 30px; */
   color: #555;
 }
 
 
+@media (max-width: 500px) {
+  .task-container{
+    font-size: 0.8rem;
+  }
+}
+/* 
 .task-buttons{
   display: flex;
   justify-content: space-evenly;
   align-items: center;
   width: 100%;
-}
+} */
 
 .task-buttons button{
   margin: 0 4px;

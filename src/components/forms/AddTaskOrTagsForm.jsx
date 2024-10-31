@@ -13,21 +13,26 @@ function AddTaskOrTagsForm({ tags, setTasks, setTags, setTimestamps, showSnackba
   const [newTaskName, setNewTaskName] = useState("");
   const [selectedTags, setSelectedTags] = useState([]);
 
-  // Handles the addition of a new task to the database
+  // Handles the addition of a new task
   const handleAddTask = async () => {
     const newTaskData = {
       name: newTaskName,
-      tags: selectedTags.join(","),
+      tags: selectedTags,
     };
     try {
       const { newTaskObject, newTagObjects, newTimestampObject } = await addTask(newTaskData, tags);
       setTasks((prevTasks) => [...prevTasks, newTaskObject]);
+      setTimestamps((prevTimestamps) => [...prevTimestamps, newTimestampObject]);
 
       if (newTagObjects.length > 0) {
         setTags((prevTags) => [...prevTags, ...newTagObjects]);
+        showSnackbar(`Task added successfully.\n
+          New tag(s): ${newTagObjects.map(t =>"\"" + t.name + "\"").join(", ")} 
+          were added to the database.`, "success");
+      } else {
+        showSnackbar("Task added successfully.", "success");
       }
-      setTimestamps((prevTimestamps) => [...prevTimestamps, newTimestampObject]);
-      showSnackbar("Task added successfully.", "success");
+
       resetForm();
     } catch (error) {
       console.error("Error adding task:", error);
@@ -38,7 +43,7 @@ function AddTaskOrTagsForm({ tags, setTasks, setTags, setTimestamps, showSnackba
     // Handles adding tags only
     const handleAddTagsOnly = async () => {
       try {
-        const { existingTagIds, newTagObjects } = await checkIfTagsExists(selectedTags.join(","), tags);
+        const { existingTagIds, newTagObjects } = await checkIfTagsExists(selectedTags, tags);
         if (newTagObjects.length > 0) {
           setTags((prevTags) => [...prevTags, ...newTagObjects]);
           showSnackbar(`New tag(s): ${newTagObjects.map(t =>"\"" + t.name + "\"").join(", ")} were added to the database.`, "success");
@@ -70,12 +75,12 @@ function AddTaskOrTagsForm({ tags, setTasks, setTags, setTimestamps, showSnackba
     } else if (newTaskName && selectedTags.length === 0) {
       showSnackbar("Please enter at least one tag for this task", "warning");
     } else {
-      showSnackbar("Please enter a task name or select at least one tag", "warning");
+      showSnackbar("Please enter a task name or create at least one tag", "warning");
     }
   };
 
   return (
-    <Container fluid={true}>
+    <Container fluid="small" as="section">
       <Form onSubmit={handleSubmit}>
 
           <Row>

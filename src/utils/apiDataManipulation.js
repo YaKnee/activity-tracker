@@ -2,17 +2,17 @@ import dayjs from "dayjs";
 import { fetchTimesPerTask } from "./api";
 
 // Convert tag IDs from task objects to tag names
-export const getTagNames = (tagsString, allTags) => {
+export const getTagNames = (taskTagArray, allTags) => {
   // Return empty string if all tags have been deleted
-  if (tagsString.length == 0) return "";
+  if (taskTagArray.length === 0) return "";
 
-  const tagIds = (tagsString.split(",").map(Number));
+  const tagIds = (taskTagArray.split(",").map(Number));
   const tagNames = tagIds.map(tagId => {
     const tagObject = allTags.find(tag => tag.id === tagId);
     return tagObject.name;
   })
-  const sortedTagNames = tagNames.sort();
-  return sortedTagNames.join(", ");
+  //const sortedTagNames = tagNames.sort();
+  return tagNames;
 }
 
 export const getLastTimestampForSpecificTask = async () => {

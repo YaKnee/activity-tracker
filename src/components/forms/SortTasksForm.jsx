@@ -17,92 +17,87 @@ import ListIcon from '@mui/icons-material/List';
 import ArrowCircleUpTwoToneIcon from '@mui/icons-material/ArrowCircleUpTwoTone';
 import ArrowCircleDownTwoToneIcon from '@mui/icons-material/ArrowCircleDownTwoTone';
 
-const SortTasksForm = ({ taskStates, setTaskStates, sortedTasks, setSortedTasks }) => {
-  //Value = id/name/tags(amount)/firstTimestamp(created)/lastTimestamp/active/totalTime; 
-  //order= 0 is ascending, 1 is descending
+const SortTasksForm = ({ taskStates, setSortedTasks }) => {
 
-  const [sortingCriteria, setSortingCriteria] = useState({ value: "id", order: 0});
+  const [sortingCriteria, setSortingCriteria] = useState({ value: "id", order: "ascending"});
   const [isSorting, setIsSorting] = useState(false);
 
-  const handleOpen = () => {
-    setIsSorting(true);
-  };
-  const handleClose = () => {
-    setIsSorting(false);
-    console.log(sortingCriteria)
-  };
+  // Opens sorting dialog
+  const handleOpen = () => setIsSorting(true);
+  // Closes sorting dialog
+  const handleClose = () => setIsSorting(false);
 
+  // Sorts tasks when either sorting criteria changes
   useEffect(() => {
-    setSortedTasks([...taskStates])
-    console.log(sortingCriteria)
-    console.log("Current tasks states:", taskStates)
-  }, [taskStates])
+    handleSort()
+  }, [sortingCriteria])
 
+  // Updates criteria value based on user selection
   const handleChangeValue = (event) => {
     setSortingCriteria((prevState) => ({
       ...prevState,
       value: event.target.value,
     }));
-
-    handleSort()
   };
   
+  // Updates sorting order
   const handleChangeOrder = () => {
     setSortingCriteria((prevState) => ({
       ...prevState,
-      order: prevState.order === 0 ? 1 : 0,
+      order: prevState.order === "ascending" ? "descending" : "ascending",
     }));
-    // Directly reverse sortedTasks
-    handleSort();
   };
+
+  // Resets sorting criteria and closes dialog
+  const handleRevert = () => {
+    setSortingCriteria({ value: "id", order: "ascending"})
+    handleClose();
+  }
+
+  // Handles sorting logic based on criteria
   const handleSort = () => {
-
-    const updatedTasks = sortedTasks.map((task) => {
-      if (task.active) {
-        return {
-          ...task,
-          totalActiveDuration:  dayjs().diff(dayjs(task.latestTimestamp), "seconds"),
-          latestTimestamp: dayjs().format("YYYY-MM-DD HH:mm:ss:SSS"),
-        };
-      }
-      return task;
-    });
-
+    // Create shallow copy of states. Breaks if no copy
+    const taskStatesCopy = [...taskStates];
     const { value, order } = sortingCriteria
-      // Sorting logic based on `sortingValue.value`
-    updatedTasks.sort((a, b) => {
-      if (value === "id" || value === "totalActiveDuration") {
-        // Integer comparison
-        return a[value] - b[value];
-      } else if (value === "name") {
-        // String comparison (alphabetical)
-        return a[value].localeCompare(b[value]);
-      } else if (value === "tags") {
-        const tagsA = a.tags.split(",").map(tag => tag.trim());
-        const tagsB = b.tags.split(",").map(tag => tag.trim());
-  
-        // Compare tags one-by-one
-        for (let i = 0; i < Math.min(tagsA.length, tagsB.length); i++) {
-          const comparison = tagsA[i].localeCompare(tagsB[i]);
-          if (comparison !== 0) {
-            return comparison;
+
+    taskStatesCopy.sort((a, b) => {
+      let comparison = 0;
+
+      switch (value) {
+        case "id":
+          comparison = a.id - b.id;
+          break;
+        case "name":
+          comparison = a.name.localeCompare(b.name);
+          break;
+        case "tags":
+          // Handle empty tags first
+          if (a.tags.length === 0 && b.tags.length > 0) return order === "ascending" ? -1 : 1;
+          if (a.tags.length > 0 && b.tags.length === 0) return order === "ascending" ? 1 : -1;
+
+          // Compare tags one by one
+          for (let i = 0; i < Math.min(a.tags.length, b.tags.length); i++) {
+            const comparison = a.tags[i].localeCompare(b.tags[i]);
+            if (comparison !== 0) return order === "ascending" ? comparison : -comparison;
           }
-        }
-        return tagsB.length - tagsA.length;
-      } else if (value === "firstTimestamp" || value === "latestTimestamp") {
-        // Day.js date comparison
-        return dayjs(a[value]).isBefore(dayjs(b[value])) ? -1 : 1;
+          // If all compared tags are equal, sort by number of tags
+          comparison = a.tags.length - b.tags.length;
+          break;
+        case "active":
+          comparison = (a.active === b.active) ? 0 : (a.active ? -1 : 1);
+          break;
+        case "totalTime":
+          comparison = a.totalTime - b.totalTime;
+          break;
+        default:
+          return 0;
       }
-      return 0;
+
+      // Apply order to comparison result
+      return order === "ascending" ? comparison : -comparison;
     });
 
-    if (sortingCriteria.order === 1) {
-      updatedTasks.reverse();
-    }
-
-
-    // Update sortedTasks with updatedTasks
-    setTaskStates(updatedTasks);
+    setSortedTasks(taskStatesCopy);
   };
 
 
@@ -110,7 +105,7 @@ const SortTasksForm = ({ taskStates, setTaskStates, sortedTasks, setSortedTasks 
     <>
       <Button 
         variant="contained" 
-        color="error" 
+        color="primary" 
         startIcon={<SwapVertIcon />}
         onClick={handleOpen}
       >
@@ -137,25 +132,26 @@ const SortTasksForm = ({ taskStates, setTaskStates, sortedTasks, setSortedTasks 
                   label="Value"
                   IconComponent={ListIcon}
                 >
-                  <MenuItem value={"id"}>ID</MenuItem>
+                  <MenuItem value={"id"}>Created</MenuItem>
                   <MenuItem value={"name"}>Name</MenuItem>
                   <MenuItem value={"tags"}>Tags</MenuItem>
-                  <MenuItem value={"firstTimestamp"}>Created</MenuItem>
                   <MenuItem value={"active"}>Active</MenuItem>
-                  <MenuItem value={"totalActiveDuration"}>Total Time Active</MenuItem>
+                  <MenuItem value={"totalTime"}>Total Time Active</MenuItem>
                 </Select>
               </FormControl>
             </Col>
             <Col sm={5}>
               <Button variant="contained" color="secondary" onClick={handleChangeOrder}>
-                  {sortingCriteria.order === 1 ? <ArrowCircleDownTwoToneIcon/> : <ArrowCircleUpTwoToneIcon/>}
+                  {sortingCriteria.order === "descending" ? <ArrowCircleDownTwoToneIcon/> : <ArrowCircleUpTwoToneIcon/>}
                 </Button>
             </Col>
-            </Row>
+          </Row>
 
         </DialogContent>
         <DialogActions>
-
+          <Button variant="contained" color="primary" onClick={handleRevert}>
+            Revert
+          </Button>
 
         </DialogActions>
       </Dialog>

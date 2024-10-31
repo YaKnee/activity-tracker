@@ -43,7 +43,7 @@ export const addTag = async (name) => {
 
 // Checks if specified tags exist and adds any new tags to the database
 export const checkIfTagsExists = async (tags, existingTags) => {
-  const tagNames = tags.split(",").map((tag) => tag.trim());
+  const tagNames = tags.map((tag) => tag.trim());
   const existingTagIds = [];
   const newTagObjects = [];
 
@@ -87,7 +87,7 @@ export const addTask = async (newTaskData, existingTags) => {
   });
   // Create a timestamp for this new task
   const taskTimeOfCreation = {
-    timestamp: new Date(),
+    timestamp: dayjs().format("YYYY-MM-DD HH:mm:ss.SSS"),
     task: newTaskResponse.id,
     type: 1
   };
@@ -96,6 +96,7 @@ export const addTask = async (newTaskData, existingTags) => {
   const newTaskObject = { id: newTaskResponse.id, ...newTaskData };
   return { newTaskObject, newTagObjects, newTimestampObject };
 };
+
 
 // Updates an existing task with new data and handles tags
 export const updateTask = async (id, updatedTask, allTags) => {
