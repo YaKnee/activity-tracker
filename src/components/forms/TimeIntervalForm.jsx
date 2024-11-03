@@ -5,13 +5,13 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { MobileDateTimePicker } from '@mui/x-date-pickers/MobileDateTimePicker';
 
 function TimeIntervalForm({ timeRange, setTimeRange }) {
-    const [startValue, setStartValue] = useState(dayjs(timeRange.start));
-    const [endValue, setEndValue] = useState(dayjs(timeRange.end));
+    const [startValue, setStartValue] = useState(timeRange.start);
+    const [endValue, setEndValue] = useState(timeRange.end);
 
     // Update startValue and endValue when timeRange changes
     useEffect(() => {
-        setStartValue(dayjs(timeRange.start));
-        setEndValue(dayjs(timeRange.end));
+        setStartValue(timeRange.start);
+        setEndValue(timeRange.end);
     }, [timeRange]);
 
     const handleStartChange = (newValue) => {

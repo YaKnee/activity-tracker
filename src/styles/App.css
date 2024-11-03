@@ -89,8 +89,8 @@ section::before {
 }
 /*======================================Tasks=================================*/
 .task-grid {
-  min-height: 80vh;
-  max-height: 150vh;
+  /* min-height: 80vh;
+  max-height: 150vh; */
   overflow-y: auto;
   /* scrollbar-color: #1976D2 #767676;  */
   display: flex; 
@@ -108,16 +108,19 @@ section::before {
 .task-container {
   flex-grow: 1;
   background-color: #f9f9f9;
+  /* background-color: #fbe17889; */
   border: 1px solid #ddd;
   border-radius: 12px;
-  padding: 20px;
+  padding: 5px;
   box-shadow: 0 2px 5px black;
   width: 300px;
+
   box-sizing: border-box; 
 }
 
 .task-container table {
   width: 100%;
+  height: 100%;
   border-collapse: collapse;
 }
 

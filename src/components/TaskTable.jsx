@@ -4,19 +4,19 @@ import Paper from "@mui/material/Paper";
 
 function TaskTable({ taskStates, chosenTask, setChosenTask }) {
 
-  const [selectedRow, setSelectedRow] = useState(chosenTask);
+  const [selectedRow, setSelectedRow] = useState();
 
   const columns = [
-    { field: "id", headerName: "ID", type: "number", minWidth: 70 },
+    { field: "id", headerName: "ID", type: "number", minWidth: 50 },
     { field: "name", headerName: "Name", type: "string", minWidth: 120 },
     {
       field: "created",
       headerName: "Created",
       type: "dateTime",
       flex: 1,
-      minWidth: 200,
+      minWidth: 150,
     },
-    { field: "active", heaerName: "Active", type: "boolean", minWidth: 70 },
+    { field: "active", headerName: "Active", type: "boolean", minWidth: 120 },
   ];
   const rows = taskStates.map((state) => {
     return {
@@ -32,7 +32,7 @@ function TaskTable({ taskStates, chosenTask, setChosenTask }) {
   useEffect(() => {
     // Set the selected row when chosenTask changes
     setSelectedRow(chosenTask);
-  }, [chosenTask]);
+  }, [rows.length]);
 
 
   // Handle row selection change

@@ -18,7 +18,7 @@ import { fetchData } from "./utils/api";
 import { getTagNames, getTaskSpecificTotalActiveTime } from "./utils/apiDataManipulation";
 import About from "./pages/About";
 import Settings from "./pages/Settings";
-import DailyBarChart from "./components/DailyBarChart";
+import DailyActiveTimes from "./pages/DailyActiveTimes";
 import TaskManager from "./pages/TaskManager";
 import Home from "./pages/Home";
 
@@ -56,7 +56,6 @@ function App() {
       const taskTimestampObjects = 
         timestamps.filter(t => t.task === task.id)
                   .sort((a, b) => dayjs(a.timestamp) - dayjs(b.timestamp));
-      
       const taskTagArray = 
         task.tags.length > 0
           ? task.tags.split(",").map((id, index) => ({
@@ -70,7 +69,7 @@ function App() {
         id: task.id,
         name: task.name,
         tags: sortedTags.map(t => t.name),
-        timestamps: taskTimestampObjects.map(t => t.timestamp),
+        timestamps: taskTimestampObjects.map(t => ({time: t.timestamp, type: t.type})),
         totalTime: getTaskSpecificTotalActiveTime(taskTimestampObjects),
         active: taskTimestampObjects[taskTimestampObjects.length - 1].type === 0,
       };
@@ -99,7 +98,7 @@ function App() {
     snackbarRef.current.showSnackbar(message, severity);
   };
 
-  // Handles
+  // Handles closing the Navbar
   const handleCloseNavbar = () => {
     setNavbarExpanded(false);
   };
@@ -120,7 +119,7 @@ function App() {
             expanded={navbarExpanded}
             ref={navbarRef} 
             role="navigation"
-            as="navbar"
+            as="nav"
           >
             <Container fluid="md">
               <Navbar.Brand as={Link} to="/">
@@ -182,7 +181,7 @@ function App() {
             <Route 
               path="/task-daily"
               element={
-                <DailyBarChart taskStates={taskStates}/>
+                <DailyActiveTimes taskStates={taskStates}/>
               }
             />
             <Route 

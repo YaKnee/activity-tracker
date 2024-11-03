@@ -128,14 +128,23 @@ const deleteTimestamps = async (taskId, timestamps) => {
   await Promise.all(deletePromises);
 };
 
-// Deletes tag and updates all tasks that used that tag
-export const deleteTag = async (tagId, tasks) => {
-  await apiFetch(`${API}/tags/${tagId}`, { method: "DELETE", headers: { "Content-Type": "application/json" } });
-  
-  const tasksToUpdate = tasks.filter((task) => task.tags.includes(tagId));
+// Deletes multiple tags and updates all tasks that used those tags
+export const deleteTags = async (tagIds, tasks) => {
+  for (const tagId of tagIds) {
+    await apiFetch(`${API}/tags/${tagId}`, { method: "DELETE", headers: { "Content-Type": "application/json" } });
+  }
+
+  const tasksToUpdate = tasks.filter(task =>
+    task.tags.split(",").some(id => tagIds.includes(Number(id)))
+  );
+
   for (const task of tasksToUpdate) {
-    const updatedTags = task.tags.split(",").filter((id) => id !== String(tagId)).join(",");
-    
+    const updatedTags = task.tags
+      .split(",")
+      .filter(id => !tagIds.includes(Number(id)))
+      .join(",");
+    console.log(updatedTags);
+
     await apiFetch(`${API}/tasks/${task.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },

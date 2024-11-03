@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import TimeIntervalForm from "../components/forms/TimeIntervalForm";
-import TimeIntervalGraph from "../components/TimeIntervalGraph";
+// import TimeIntervalGraph from "../components/graphs/TimeIntervalGraph";
 import { fetchTimesPerTask } from "../utils/api"; // Adjust import path as needed
 import "../styles/App.css";
 
@@ -42,7 +42,7 @@ function Home({ tasks, tags, timestamps, showSnackbar }) {
                 setTimeRange={setTimeRange} 
                 showSnackbar={showSnackbar} 
             />
-            <TimeIntervalGraph timestamps={timesForTask} timeRange={timeRange} />
+            {/* <TimeIntervalGraph timestamps={timesForTask} timeRange={timeRange} /> */}
         </section>
     );
 }

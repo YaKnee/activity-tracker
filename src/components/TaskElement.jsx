@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
+import dayjs from "dayjs";
 import Button from "@mui/material/Button";
 import NoteAltIcon from '@mui/icons-material/NoteAlt';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Container from 'react-bootstrap/Container';
 import TextField from "@mui/material/TextField";
-import dayjs from "dayjs";
 import AutoCompleteTagsForm from "./forms/AutoCompleteTagsForm";
 import { deleteTask, updateTask, addTimestamp } from "../utils/api";
-import "../styles/App.css";
+
 
 
 
@@ -16,6 +16,23 @@ const TaskElement = ({ taskState, allTags, allTimestamps, setTasks, setTags, set
   const [localTotalTime, setLocalTotalTime] = useState(taskState.totalTime);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editState, setEditState] = useState({});
+  
+  // useEffect(() => {
+  //   return () => {
+  //     setLocalTotalTime(localTotalTime)
+  //     setTaskStates((prevStates) => {
+  //       return prevStates.map((state) => {
+  //         if (state.id === taskState.id) {
+  //           return {
+  //             ...state,
+  //             totalTime: localTotalTime
+  //           };
+  //         }
+  //         return state; 
+  //       });
+  //     });
+  //   };
+  // }, [setTaskStates, localTotalTime])
 
   //Updates tags in the UI when they change in the database
   // useEffect(() => {
@@ -46,7 +63,7 @@ const TaskElement = ({ taskState, allTags, allTimestamps, setTasks, setTags, set
 
       return () => clearInterval(timer);
     }
-  }, [taskState.active]);
+  }, [taskState.active, setLocalTotalTime]);
 
   // Toggles active state and adds new timestamp to track status changes
   const toggleActive = async () => {
@@ -68,7 +85,10 @@ const TaskElement = ({ taskState, allTags, allTimestamps, setTasks, setTags, set
             ? {
                 ...state,
                 active: !state.active,
-                timestamps: [...state.timestamps, now],
+                timestamps: [
+                  ...state.timestamps, 
+                  { time: newTimestampData.timestamp, type: newTimestampData.type }
+                ],
               }
             : state
         )
@@ -172,7 +192,7 @@ const TaskElement = ({ taskState, allTags, allTimestamps, setTasks, setTags, set
   
   return (
     <>
-      <table>
+      <table style={{ backgroundColor: isEditMode ? "#fbe17889" : "#f9f9f9"}}>
         <tbody>
           <tr>
             <th>Name:</th>
@@ -203,11 +223,11 @@ const TaskElement = ({ taskState, allTags, allTimestamps, setTasks, setTags, set
           </tr>
           <tr>
             <th>Created:</th>
-            <td>{taskState.timestamps[0].slice(0, -4)}</td>
+            <td>{taskState.timestamps[0].time.slice(0, -4)}</td>
           </tr>
           <tr>
             <th>Last Toggle:</th>
-            <td>{taskState.timestamps[taskState.timestamps.length - 1].slice(0, -4)}</td>
+            <td>{taskState.timestamps[taskState.timestamps.length - 1].time.slice(0, -4)}</td>
           </tr>
           <tr>
             <th>Total Duration:</th>
