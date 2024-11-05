@@ -1,8 +1,9 @@
 import React, { useEffect, useState }from "react";
-import dayjs from "dayjs";
-import Container from "react-bootstrap/Container";
+
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+
+import Stack from "@mui/material/Stack";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -17,7 +18,7 @@ import ListIcon from '@mui/icons-material/List';
 import ArrowCircleUpTwoToneIcon from '@mui/icons-material/ArrowCircleUpTwoTone';
 import ArrowCircleDownTwoToneIcon from '@mui/icons-material/ArrowCircleDownTwoTone';
 
-const SortTasksForm = ({ taskStates, setSortedTasks }) => {
+const SortTasksForm = ({ taskStates, sortedTasks, setSortedTasks }) => {
 
   const [sortingCriteria, setSortingCriteria] = useState({ value: "id", order: "ascending"});
   const [isSorting, setIsSorting] = useState(false);
@@ -30,7 +31,7 @@ const SortTasksForm = ({ taskStates, setSortedTasks }) => {
   // Sorts tasks when either sorting criteria changes
   useEffect(() => {
     handleSort()
-  }, [sortingCriteria])
+  }, [sortingCriteria, sortedTasks]);
 
   // Updates criteria value based on user selection
   const handleChangeValue = (event) => {
@@ -105,7 +106,7 @@ const SortTasksForm = ({ taskStates, setSortedTasks }) => {
     <>
       <Button 
         variant="contained" 
-        color="primary" 
+        color={sortingCriteria.value !== "id" ? "warning" : "primary"}
         startIcon={<SwapVertIcon />}
         onClick={handleOpen}
       >
@@ -119,36 +120,38 @@ const SortTasksForm = ({ taskStates, setSortedTasks }) => {
           </DialogContentText>
 
 
-        
-          <Row>
-            <Col sm={5}>
-              <FormControl required variant="filled">
-                <Select
-                  // fullWidth
-                  labelId="ValueSelectLabel"
-                  id="ValueSelect"
-                  value={sortingCriteria.value}
-                  onChange={handleChangeValue}
-                  label="Value"
-                  IconComponent={ListIcon}
-                >
-                  <MenuItem value={"id"}>Created</MenuItem>
-                  <MenuItem value={"name"}>Name</MenuItem>
-                  <MenuItem value={"tags"}>Tags</MenuItem>
-                  <MenuItem value={"active"}>Active</MenuItem>
-                  <MenuItem value={"totalTime"}>Total Time Active</MenuItem>
-                </Select>
-              </FormControl>
-            </Col>
-            <Col sm={5}>
-              <Button variant="contained" color="secondary" onClick={handleChangeOrder}>
-                  {sortingCriteria.order === "descending" ? <ArrowCircleDownTwoToneIcon/> : <ArrowCircleUpTwoToneIcon/>}
-                </Button>
-            </Col>
-          </Row>
+          <Stack direction={{xs: "column", sm: "row"}} spacing={{xs: 4}}>
+
+            <FormControl required variant="filled" fullWidth>
+              <Select
+                fullWidth
+                labelId="ValueSelectLabel"
+                id="ValueSelect"
+                value={sortingCriteria.value}
+                onChange={handleChangeValue}
+                label="Value"
+                //IconComponent={ListIcon}
+              >
+                <MenuItem value={"id"}>Created</MenuItem>
+                <MenuItem value={"name"}>Name</MenuItem>
+                <MenuItem value={"tags"}>Tags</MenuItem>
+                <MenuItem value={"active"}>Active</MenuItem>
+                <MenuItem value={"totalTime"}>Total Time Active</MenuItem>
+              </Select>
+            </FormControl>
+            
+            <Button 
+              className="px-4"
+              variant="contained" 
+              color="primary"
+              onClick={handleChangeOrder} 
+              startIcon={sortingCriteria.order === "descending" ? <ArrowCircleDownTwoToneIcon/> : <ArrowCircleUpTwoToneIcon/>}>
+              {sortingCriteria.order === "descending" ? "Descending" : "Ascending"}
+            </Button>
+          </Stack>
 
         </DialogContent>
-        <DialogActions>
+        <DialogActions style={{justifyContent: "start"}}>
           <Button variant="contained" color="primary" onClick={handleRevert}>
             Revert
           </Button>

@@ -23,7 +23,6 @@ function AutoCompleteTagsForm({
   return (
     <>
       <Autocomplete
-        style={{ marginTop: "8px"}}
         multiple
         className="auto-tags"
         clearIcon={<CancelRoundedIcon />}

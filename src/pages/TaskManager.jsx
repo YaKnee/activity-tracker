@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+
 import AddTaskOrTagsForm from "../components/forms/AddTaskOrTagsForm";
 import DeleteTagForm from "../components/forms/DeleteTagForm";
 import FilterTagsForm from "../components/forms/FilterTagsForm";
@@ -6,20 +7,14 @@ import SortTasksForm from "../components/forms/SortTasksForm";
 import TaskElement from "../components/TaskElement";
 import "../styles/App.css";
 
-function TaskManager({ tasks, setTasks, tags, setTags, timestamps, setTimestamps, taskStates, setTaskStates, showSnackbar }) {
+function TaskManager({tasks, setTasks, tags, setTags, timestamps, setTimestamps, taskStates, setTaskStates, showSnackbar, darkMode, selectionMode}) {
 
   const [filteredTags, setFilteredTags] = useState([]);
-  const [sortedTasks, setSortedTasks] = useState([]);
+  const [sortedTasks, setSortedTasks] = useState(taskStates);
   const [filteredAndSortedTasks, setFilteredAndSortedTasks] = useState([]);
  
   useEffect(() => {
-    setSortedTasks(taskStates);
-  }, [taskStates]);
-
-  useEffect(() => {
-    const updatedTasks = 
-      // Default Mode: show all tasks if no filters are set
-      filteredTags.length === 0 
+    const updatedTasks = filteredTags.length === 0 
         ? sortedTasks // No filter
         : filteredTags.includes("noTags")
           // Filter for tasks without tags
@@ -40,11 +35,11 @@ function TaskManager({ tasks, setTasks, tags, setTags, timestamps, setTimestamps
       <h1>Manager:</h1>
 
         <AddTaskOrTagsForm 
-          tags={tags} 
           setTasks={setTasks} 
+          tags={tags} 
           setTags={setTags} 
           setTimestamps={setTimestamps}
-          showSnackbar={showSnackbar} 
+          showSnackbar={showSnackbar}
         />
 
         <section>
@@ -63,14 +58,17 @@ function TaskManager({ tasks, setTasks, tags, setTags, timestamps, setTimestamps
                 <div key={`container-${task.id}`} className="task-container">
                   <TaskElement
                     key={task.id}
-                    taskState={task}
-                    allTags={tags}
-                    allTimestamps={timestamps}
-                    setTasks={setTasks}
-                    setTags={setTags}
-                    setTimestamps={setTimestamps}
+                    element={task}
+                    taskStates={taskStates}
                     setTaskStates={setTaskStates}
+                    setTasks={setTasks}
+                    tags={tags}
+                    setTags={setTags}
+                    timestamps={timestamps}
+                    setTimestamps={setTimestamps}
                     showSnackbar={showSnackbar}
+                    darkMode={darkMode}
+                    selectionMode={selectionMode}
                   />
                 </div>
               )
@@ -80,12 +78,10 @@ function TaskManager({ tasks, setTasks, tags, setTags, timestamps, setTimestamps
 
 
         <DeleteTagForm 
-          tasks={tasks} 
-          setTasks={setTasks} 
-          tags={tags} 
-          setTags={setTags} 
-          taskStates={taskStates}
-          setTaskStates={setTaskStates}
+          tasks={tasks}
+          setTasks={setTasks}
+          tags={tags}
+          setTags={setTags}
           showSnackbar={showSnackbar}
         />
     </>

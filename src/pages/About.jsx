@@ -1,12 +1,17 @@
 import React from "react";
-import "../styles/App.css";
 
-function About() {
+import { Table } from "react-bootstrap";
+
+function About({ darkMode }) {
   return (
     <>
-
       <section>
-        <h3>Author: <em><strong>Jani O&#39;Connell</strong></em></h3>
+        <h3>
+          Author:{" "}
+          <em>
+            <strong>Jani O&#39;Connell</strong>
+          </em>
+        </h3>
       </section>
 
       <section>
@@ -29,10 +34,8 @@ function About() {
 
       <section id="about-credits">
         <h3>Accredidation: </h3>
-        <table id="credit-table">
-          <caption>
-            Assets used and their respective licences
-          </caption>
+        <Table variant="dark" striped hover id="credit-table">
+          <caption>Assets used and their respective licences</caption>
           <thead>
             <tr>
               <th>Item</th>
@@ -42,54 +45,82 @@ function About() {
           </thead>
           <tbody>
             <tr>
-              <td>Logo</td>
+              <td>Brand</td>
               <td>none</td>
               <td>Self-made</td>
             </tr>
             <tr>
-              <td>Video</td>
-              <td>___</td>
-              <td><a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank">yt</a></td>
+              <td>Icons for Buttons and Links</td>
+              <td>MIT</td>
+              <td>
+                <a
+                  href="https://mui.com/material-ui/material-icons/"
+                  target="_blank"
+                >
+                  MUI Icons
+                </a>
+              </td>
             </tr>
             <tr>
               <td>something</td>
               <td>MIT</td>
-              <td><a href="https://github.com/facebook/react/tree/main" target="_blank">something</a></td>
+              <td>
+                <a
+                  href="https://github.com/facebook/react/tree/main"
+                  target="_blank"
+                >
+                  something
+                </a>
+              </td>
             </tr>
             <tr>
               <td>RoughViz Charts</td>
               <td>MIT</td>
-              <td><a href="https://github.com/jwilber/roughViz" target="_blank">GitHub</a></td>
+              <td>
+                <a href="https://github.com/jwilber/roughViz" target="_blank">
+                  GitHub
+                </a>
+              </td>
             </tr>
           </tbody>
-        </table>
+        </Table>
       </section>
 
       <section>
         <h3>AI Usage:</h3>
         <ul>
           <li>
-            <p>
-              CSS for task-buttons. When I clicked edit button and rendered the other buttons, it messed up the sizing of the table
-              and components were leaking over, so I asked ChatGPT to help fix it.
-            </p>
+            <p></p>
           </li>
           <li>
             <p>
-              Formatting date objects to UTC when adding/deleting timestamps to backend, 
-              and updating timestamp state.
+              Calculating the average total time for the bar chart and copying
+              it to an array the same size as the dayEntries array.
             </p>
           </li>
         </ul>
-
       </section>
       <section>
-        <h3>Time spent: <em>27 hours</em></h3>
+        <h3>
+          Time spent: <em>~92 hours</em>
+        </h3>
       </section>
       <section>
         <h3>Most complex feature:</h3>
-        <p><strong>What:</strong> Task addition</p>
-        <p><strong>Why:</strong> Managing dates and state logic for each individual task is quite hard.</p>
+        <p>
+          <strong>What:</strong> Calculating daily active times for the bar
+          chart
+        </p>
+        <p>
+          <strong>Why: </strong>
+          There were just so many edge cases that needed to be considered and
+          due to the test data that we had that was generated on initialisation
+          having type 0 as the first timestamp (impossible now with my current
+          setup from user end), I had to think and think and think of all
+          possibilities of how the timestamps could be calculated. There
+          definitely is a much easier way but, at this point, it works so I will
+          not alter it any further.
+        </p>
       </section>
     </>
   );

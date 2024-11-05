@@ -16,10 +16,14 @@ html, body {
 .nav-icons {
   margin-top: -5px;
 }
+/* .dropdown-menu {
+  background-color: transparent !important;
+} */
 .nav-drop-items {
   display: flex;
   text-align: right;
 }
+
 .nav-drop-items > .nav-icons {
   margin-top: 0;
   margin-right: 5px;
@@ -28,7 +32,7 @@ html, body {
   padding-right: 10px;
   border-radius: 5px;
 }
-.nav-link:hover {
+.nav-link:hover, .nav-drop-items:hover  {
   background-color: #00000056;
   transition: 0.2s;
 }
@@ -55,7 +59,7 @@ section::before {
   width: 100%;
   height: 2px;
   background-color: rgb(71, 71, 165);
-  margin-top: 10px;
+  margin: 10px 0;
   /* clear: both; */
 }
 
@@ -128,14 +132,13 @@ section::before {
   text-align: center;
   /* padding: 0 5px; */
   font-weight: bold;
-  color: #333;
   background-color: #0000001d;
 }
 
 .task-container td {
   padding: 8px 0;
   /* max-height: 30px; */
-  color: #555;
+  /* color: #555; */
 }
 
 
@@ -144,41 +147,29 @@ section::before {
     font-size: 0.8rem;
   }
 }
-/* 
-.task-buttons{
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-  width: 100%;
-} */
 
 .task-buttons button{
-  margin: 0 4px;
-  flex: 1;
+  margin: 1px;
   box-sizing: border-box;
-  height: 100%;
   border: 1px solid black;
 }
+/* ===================================Graphs================================= */
+
+.chart-container{
+  min-height: 400px;
+  max-height: 60vh;
+  margin-bottom: 100px;
+}
+#daily-bar-chart{
+  height: 100% !important;
+  width: 100%;
+
+}
+
 
 
 /*====================================Settings================================*/
-#theme-button-light{
-  background-color: white;
-  color: black;
-}
-#theme-button-dark{
 
-}
-#theme-button-rainbow{
-  background: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet, red);
-}
-
-#setting-theme button{
-  margin: 10px;
-}
-#setting-mode label *{
-  margin: 10px;
-}
 
 /*=====================================About==================================*/
 #about-credits {

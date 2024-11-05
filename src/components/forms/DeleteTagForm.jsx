@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
+
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+
 import DeleteIcon from '@mui/icons-material/Delete';
 import Button from '@mui/material/Button';
+
 import AutoCompleteTagsForm from './AutoCompleteTagsForm';
 import { deleteTags } from '../../utils/api';
 
-export default function DeleteTagForm({ tasks, setTasks, tags, setTags, taskStates, setTaskStates, showSnackbar }) {
+function DeleteTagForm({ tasks, setTasks, tags, setTags, showSnackbar}) {
+
   const [selectedTags, setSelectedTags] = useState([]);
 
   const handleDeleteTag = async () => {
@@ -36,7 +40,7 @@ export default function DeleteTagForm({ tasks, setTasks, tags, setTags, taskStat
       setTags(updatedTags);
       setTasks(updatedTasks);
       showSnackbar(`Tag(s): "${selectedTags.join(", ")}" were deleted`, "success");
-      setSelectedTags([]); // Clear the selection after deletion
+      setSelectedTags([]);
     } catch (error) {
       console.error("Error deleting tag:", error);
       showSnackbar("Error deleting tags. Please try again", "error");
@@ -44,7 +48,7 @@ export default function DeleteTagForm({ tasks, setTasks, tags, setTags, taskStat
   };
 
   return (
-    <Container fluid as="section">
+    <Container fluid className="py-4" as="section">
       <Row>
         <Col sm={10}>
           <AutoCompleteTagsForm 
@@ -62,6 +66,7 @@ export default function DeleteTagForm({ tasks, setTasks, tags, setTags, taskStat
                   color='primary' 
                   startIcon={<DeleteIcon />} 
                   onClick={handleDeleteTag}
+                  style={{marginTop: "8px"}}
           >
               Tags
           </Button>
@@ -71,3 +76,5 @@ export default function DeleteTagForm({ tasks, setTasks, tags, setTags, taskStat
 
   );
 }
+
+export default DeleteTagForm;

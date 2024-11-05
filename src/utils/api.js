@@ -60,7 +60,7 @@ export const checkIfTagsExists = async (tags, existingTags) => {
   return { existingTagIds, newTagObjects };
 };
 
-// Adds new timestamp to database
+// Adds a new timestamp to database
 export const addTimestamp = async (newTimestampData) => {
   const newTimestampResponse = await apiFetch(`${API}/timestamps`, {
     method: "POST",
@@ -72,6 +72,11 @@ export const addTimestamp = async (newTimestampData) => {
   const newTimestampObject = { id: newTimestampResponse.id, ...newTimestampData };
   return newTimestampObject;
 };
+
+// Delete single timestamp
+export const deleteTimestamp = async (timestamp) => {
+ await apiFetch(`${API}/timestamps/${timestamp.id}`, { method: "DELETE" });
+}
 
 // Adds new task to the database, updating tags if necessary, and create a timestamp of this creation
 export const addTask = async (newTaskData, existingTags) => {
@@ -116,11 +121,11 @@ export const updateTask = async (id, updatedTask, allTags) => {
 // Delete task and all associated timestamps (Maybe change later so we can potentially restore task)
 export const deleteTask = async (id, timestamps) => {
   await apiFetch(`${API}/tasks/${id}`, { method: "DELETE" });
-  await deleteTimestamps(id, timestamps);
+  await deleteAllTimestamps(id, timestamps);
 };
 
 // Deletes timestamps associated with a specific task
-const deleteTimestamps = async (taskId, timestamps) => {
+const deleteAllTimestamps = async (taskId, timestamps) => {
   const deletePromises = timestamps
     .filter(timestamp => timestamp.task === taskId)
     .map(timestamp => apiFetch(`${API}/timestamps/${timestamp.id}`, { method: "DELETE" }));
@@ -157,4 +162,14 @@ export const deleteTags = async (tagIds, tasks) => {
 export const fetchTimesPerTask = async (taskId) => {
   const result = await apiFetch(`${API}/timesfortask/${taskId}`);
   return result;
+}
+
+
+export const updateSettings = async (newSettings) => {
+  const updatedSettingsResponse = await apiFetch(`${API}/options/${newSettings.id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(newSettings),
+  });
+  return updatedSettingsResponse;
 }

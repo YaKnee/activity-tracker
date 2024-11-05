@@ -1,15 +1,20 @@
 import React, { useState} from "react";
+
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
+
+import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField"
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+
 import AutoCompleteTagsForm from "./AutoCompleteTagsForm";
 import { addTask, checkIfTagsExists } from "../../utils/api";
 
-function AddTaskOrTagsForm({ tags, setTasks, setTags, setTimestamps, showSnackbar }) {
+function AddTaskOrTagsForm({ setTasks, tags, setTags, setTimestamps, showSnackbar}) {
+
   const [newTaskName, setNewTaskName] = useState("");
   const [selectedTags, setSelectedTags] = useState([]);
 
@@ -80,21 +85,21 @@ function AddTaskOrTagsForm({ tags, setTasks, setTags, setTimestamps, showSnackba
   };
 
   return (
-    <Container fluid="small" as="section">
-      <Form onSubmit={handleSubmit}>
+    <>
+    <Container fluid="small" as="section" >
+      <Form onSubmit={handleSubmit} className="mt-3">
 
           <Row>
-            <Col sm={5}>
+            <Col sm={5} className="mt-3">
               <TextField
                 label="Enter new task name"
                 variant="outlined"
                 fullWidth
                 value={newTaskName}
                 onChange={(e) => setNewTaskName(e.target.value)}
-                style={{ marginTop: "8px" }}
               />
             </Col>
-            <Col sm={5}>
+            <Col sm={5} className="mt-3">
               <AutoCompleteTagsForm 
                 tags={tags}
                 selectedTags={selectedTags}
@@ -108,7 +113,7 @@ function AddTaskOrTagsForm({ tags, setTasks, setTags, setTimestamps, showSnackba
                   color="primary"
                   type="submit"
                   startIcon={newTaskName || selectedTags.length > 0 ? <AddCircleOutlineIcon /> : null}
-                  style={{ marginTop: "16px" }}
+                  className="my-4"
                 >
                 {newTaskName ? "Task" : selectedTags.length > 0 ? "Tags" : <AddCircleOutlineIcon />}
               </Button>
@@ -118,6 +123,7 @@ function AddTaskOrTagsForm({ tags, setTasks, setTags, setTimestamps, showSnackba
 
       </Form>
     </Container>
+    </>
   );
 }
 
