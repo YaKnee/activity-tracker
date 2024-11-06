@@ -53,6 +53,8 @@ const DailyBarChart = ({ chosenTask, dayEntries, unit, darkMode }) => {
         data: averageLineData,
         borderColor: lineColour,
         type: "line",
+        borderWidth: 2,
+        pointStyle:false,
       },
     ],
   };

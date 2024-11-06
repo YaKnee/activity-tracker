@@ -48,14 +48,17 @@ function TaskManager({tasks, setTasks, tags, setTags, timestamps, setTimestamps,
             <FilterTagsForm allTags={tags} setFilteredTags={setFilteredTags}/>
           </div>
 
-          <div className="task-grid">
+          <div className="task-grid" style={{backgroundColor: darkMode ? "#11111E" : "#767676"}}>
             { tasks.length < 1 ? (
               <h3>No tasks added to database yet.</h3> 
             ) : filteredAndSortedTasks.length < 1 ? (
               <h3>No tasks found with these filtered tags.</h3>
             ) : (
               filteredAndSortedTasks.map(task => 
-                <div key={`container-${task.id}`} className="task-container">
+                <div 
+                key={`container-${task.id}`} 
+                className="task-container" 
+                style={{backgroundColor: darkMode ? "#000028" : "#f9f9f9"}}>
                   <TaskElement
                     key={task.id}
                     element={task}

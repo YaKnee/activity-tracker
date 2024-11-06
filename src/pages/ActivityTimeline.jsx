@@ -174,7 +174,7 @@ function ActivityTimeline({ taskStates, setTaskStates, timestamps, setTimestamps
               ))
             ) : (
               <tr>
-                <td colSpan="3">No data available</td>
+                <td colSpan="3">No intervals found. Try another time range or a different task.</td>
               </tr>
             )}
           </tbody>

@@ -76,7 +76,7 @@ section::before {
   background-color: white;
   text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
 }
-.active {
+/* .active {
   background-color: rgb(107, 230, 107);
 }
 .active:hover{
@@ -90,7 +90,7 @@ section::before {
 }
 .inactive:focus{
   background-color: rgb(186, 0, 0) !important;
-}
+} */
 /*======================================Tasks=================================*/
 .task-grid {
   /* min-height: 80vh;
@@ -111,8 +111,6 @@ section::before {
 
 .task-container {
   flex-grow: 1;
-  background-color: #f9f9f9;
-  /* background-color: #fbe17889; */
   border: 1px solid #ddd;
   border-radius: 12px;
   padding: 5px;
@@ -183,6 +181,7 @@ section::before {
 }
 caption {
   caption-side: bottom;
+  text-align: center;
   padding: 10px;
 }
 thead, tfoot {

@@ -1,19 +1,5 @@
 import dayjs from "dayjs";
 
-// Convert tag IDs from task objects to tag names
-export const getTagNamesFromIds = (taskTagArray, allTags) => {
-  // Return empty string if all tags have been deleted
-  if (taskTagArray.length === 0) return "";
-
-  const tagIds = (taskTagArray.split(",").map(Number));
-  const tagNames = tagIds.map(tagId => {
-    const tagObject = allTags.find(tag => tag.id === tagId);
-    return tagObject.name;
-  })
-  //const sortedTagNames = tagNames.sort();
-  return tagNames;
-}
-
 // Calculates total active time of a task based on its timestamps
 export const getTaskSpecificTotalActiveTime = (timestamps) => {
   let totalActiveTime = 0;
@@ -215,16 +201,6 @@ export const getActivityIntervals = (task, timeRange) => {
   let intervals = [];
   let currentStart = null;
 
-  const lastTimestampBeforeStart = timestamps
-    .filter(timestamp => dayjs(timestamp.time).isBefore(start))
-    .sort((a, b) => dayjs(a.time).diff(dayjs(b.time)))
-    .pop();
-
-  const lastTimestampAfterEnd = timestamps
-    .filter(timestamp => dayjs(timestamp.time).isAfter(end))
-    .sort((a, b) => dayjs(b.time).diff(dayjs(a.time)))
-    .pop();
-
   timestamps.forEach((timestamp) => {
     const time = dayjs(timestamp.time);
     if (timestamp.type === 0) {
@@ -253,6 +229,16 @@ export const getActivityIntervals = (task, timeRange) => {
       time: `${formatDuration(dayjs().diff(currentStart, "seconds"))}`
     });
   }
+
+  const lastTimestampBeforeStart = timestamps
+    .filter(timestamp => dayjs(timestamp.time).isBefore(start))
+    .sort((a, b) => dayjs(a.time).diff(dayjs(b.time)))
+    .pop();
+
+  const lastTimestampAfterEnd = timestamps
+    .filter(timestamp => dayjs(timestamp.time).isAfter(end))
+    .sort((a, b) => dayjs(b.time).diff(dayjs(a.time)))
+    .pop();
 
   // Adjust the first interval's start if the last timestamp before start is type 0
   if (intervals.length > 0 && lastTimestampBeforeStart && lastTimestampBeforeStart.type === 0) {

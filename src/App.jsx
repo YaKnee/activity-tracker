@@ -156,13 +156,12 @@ function App() {
         <Navbar
           expand="lg"
           bg={darkMode ? "secondary" : "dark"}
-          data-bs-theme={darkMode ? "light" : "dark"}
+          data-bs-theme="dark"
           sticky="top"
           expanded={navbarExpanded}
           ref={navbarRef}
           role="navigation"
           as="nav"
-
         >
           <Container fluid="md">
             <Navbar.Brand as={Link} to="/">
@@ -202,6 +201,8 @@ function App() {
                     </div>
                   }
                   id="nav-task-dropdown"
+                  bg="dark"
+                  db
                 >
                   <NavDropdown.Item
                     as={Link}

@@ -116,7 +116,8 @@ const SortTasksForm = ({ taskStates, sortedTasks, setSortedTasks }) => {
         <DialogTitle>Sort tasks</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Choose which element you wish to sort by, and in what order.
+            Choose which element you wish to sort by, and in what order. 
+            Clicking "Revert" will revert the task order back to time of creation in ascending order.
           </DialogContentText>
 
 

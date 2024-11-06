@@ -16,26 +16,22 @@ function About({ darkMode }) {
 
       <section>
         <h3>Instructions:</h3>
-        <p>
-          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Doloremque
-          ea error quaerat exercitationem libero, totam minus explicabo incidunt
-          sit voluptates blanditiis velit reiciendis nemo, nulla quos earum
-          dignissimos, aliquid tenetur non fuga iusto praesentium eos? Odit,
-          ipsam? Consequuntur adipisci, tempora sunt unde aspernatur dignissimos
-          nisi veniam ipsam blanditiis ab beatae perferendis mollitia commodi
-          possimus minus, error molestiae at! Nemo numquam accusantium odit
-          quidem corporis illum, dolor illo? Id, recusandae deleniti!
-          Temporibus, adipisci. Voluptas repellat deserunt sequi blanditiis
-          itaque quo ducimus laudantium totam placeat officiis, quasi voluptate
-          dicta tempore atque, corporis vel doloremque esse fugiat culpa quae
-          recusandae et non? Odio.
+        <p style={{ textAlign: "justify", textJustify: "inter-word" }}>
+          I believe that I have designed this app so that explicit intructions
+          for use are unnecessary. I have added pointers and tips that guide the
+          user to navigate the app easily. However, what is not readily
+          apparent, is that one can add either tasks or tags from the same
+          submission area (see "Manager"). While the button does change text and
+          there are alerts assisting you, it could probably be more apparent.
         </p>
       </section>
 
       <section id="about-credits">
         <h3>Accredidation: </h3>
         <Table variant="dark" striped hover id="credit-table">
-          <caption>Assets used and their respective licences</caption>
+          <caption style={{ color: darkMode ? "#DDDDDD" : "#282828" }}>
+            Assets used and their respective licences
+          </caption>
           <thead>
             <tr>
               <th>Item</th>
@@ -61,27 +57,6 @@ function About({ darkMode }) {
                 </a>
               </td>
             </tr>
-            <tr>
-              <td>something</td>
-              <td>MIT</td>
-              <td>
-                <a
-                  href="https://github.com/facebook/react/tree/main"
-                  target="_blank"
-                >
-                  something
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <td>RoughViz Charts</td>
-              <td>MIT</td>
-              <td>
-                <a href="https://github.com/jwilber/roughViz" target="_blank">
-                  GitHub
-                </a>
-              </td>
-            </tr>
           </tbody>
         </Table>
       </section>
@@ -90,12 +65,12 @@ function About({ darkMode }) {
         <h3>AI Usage:</h3>
         <ul>
           <li>
-            <p></p>
+            <p>Used for generating missing comments</p>
           </li>
           <li>
             <p>
-              Calculating the average total time for the bar chart and copying
-              it to an array the same size as the dayEntries array.
+              Calculating the average total time in DailyBarChart component and
+              copying it to an array the same size as the dayEntries array.
             </p>
           </li>
         </ul>
@@ -111,15 +86,15 @@ function About({ darkMode }) {
           <strong>What:</strong> Calculating daily active times for the bar
           chart
         </p>
-        <p>
+        <p style={{ textAlign: "justify", textJustify: "inter-word" }}>
           <strong>Why: </strong>
-          There were just so many edge cases that needed to be considered and
-          due to the test data that we had that was generated on initialisation
-          having type 0 as the first timestamp (impossible now with my current
-          setup from user end), I had to think and think and think of all
-          possibilities of how the timestamps could be calculated. There
-          definitely is a much easier way but, at this point, it works so I will
-          not alter it any further.
+          There were numerous edge cases to consider, and because the test data
+          we initially generated had a type 0 timestamp as the first entry
+          (which is no longer possible with my current setup from the user
+          side), I had to carefully think through every possible scenario for
+          how the timestamps could be calculated. While there is definitely a
+          simpler solution, this one works for now, so I'm leaving it as is
+          without further changes.
         </p>
       </section>
     </>

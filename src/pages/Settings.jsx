@@ -102,11 +102,13 @@ function Settings({
 
   // Update selectionMode when user changes the mode
   const handleModeChange = async (event, newMode) => {
-    if (newMode !== null) {
+    if (newMode === null) {
+      showSnackbar("You are already in this mode.", "info")
+    }else {
       setSelectionMode(newMode);
       const updatedSettings = {
         id: 1,
-        theme: darkMode,
+        theme: darkMode ? "dark" : "default",
         alternative: newMode,
         own_textual_data: "",
       };
@@ -197,17 +199,17 @@ function Settings({
 
   return (
     <>
-      <Stack direction={{xs: "column"}} spacing={{sm: 4}} >
-      <section style={{minWidth: "50%"}}>
+      <Stack direction={{ xs: "column" }} spacing={{ sm: 4 }}>
+        <section style={{ minWidth: "50%" }}>
           <h1>Theme:</h1>
-          <p style={{textAlign: "justify", textJustify: "inter-word"}}>
-            The theme settings let users choose between light and dark modes. This
-            feature improves visibility, especially in dim light, and changes the
-            colors of text, buttons, and charts to match the selected theme.
-            Whether you like the modern look of dark mode or the bright feel of
-            light mode, this toggle makes your workspace easier to use. The
-            changes happen instantly in the app, and your choices are saved, so
-            your preferences are always there when you log in.
+          <p style={{ textAlign: "justify", textJustify: "inter-word" }}>
+            The theme settings let you switch between light and dark modes. This
+            makes it easier to see the app, especially in low light, by
+            adjusting the colors of text, buttons, and charts to match the
+            selected theme. Whether you prefer the darker tones of dark mode or
+            the bright, clean look of light mode, this option makes the app more
+            comfortable to use. The change happens instantly, and your choice is
+            saved, so it's ready when you log in next time.
           </p>
 
           <FormControlLabel
@@ -222,15 +224,15 @@ function Settings({
           />
         </section>
 
-        <section style={{minWidth: "50%"}}>
+        <section style={{ minWidth: "50%" }}>
           <h1>Mode Selection:</h1>
-          <p style={{textAlign: "justify", textJustify: "inter-word"}}>
+          <p style={{ textAlign: "justify", textJustify: "inter-word" }}>
             The Mode Selection feature lets you personalize how you manage your
             tasks. You can switch between modes to focus on just one task at a
-            time, which helps you concentrate on what's most important. Or, if you
-            prefer, you can turn on a mode that allows you to work on multiple
-            tasks at once, giving you the flexibility to handle different
-            responsibilities.
+            time, which helps you concentrate on what's most important. Or, if
+            you prefer, you can turn on a mode that allows you to work on
+            multiple tasks at once, giving you the flexibility to handle
+            different responsibilities.
           </p>
           <ToggleButtonGroup
             size="large"
@@ -239,6 +241,7 @@ function Settings({
             exclusive
             className="mb-5"
           >
+
             <ToggleButton value={0}>
               <Filter9PlusIcon />
             </ToggleButton>
@@ -248,7 +251,6 @@ function Settings({
           </ToggleButtonGroup>
         </section>
       </Stack>
-
     </>
   );
 }

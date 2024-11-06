@@ -249,11 +249,11 @@ const TaskElement = ({ element, taskStates, setTaskStates, setTasks, tags, setTa
             </td>
           </tr>
           <tr>
-            <th>First Timestamp:</th>
+            <th>Created:</th>
             <td>{element.timestamps[0].time.slice(0, -4)}</td>
           </tr>
           <tr>
-            <th>Last Timestamp:</th>
+            <th>Last Toggle:</th>
             <td>{element.timestamps[element.timestamps.length - 1].time.slice(0, -4)}</td>
           </tr>
           <tr>
