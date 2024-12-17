@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import { useState } from "react";
 
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 
-import DeleteIcon from '@mui/icons-material/Delete';
-import Button from '@mui/material/Button';
+import DeleteIcon from "@mui/icons-material/Delete";
+import Button from "@mui/material/Button";
 
-import AutoCompleteTagsForm from './AutoCompleteTagsForm';
-import { deleteTags } from '../../utils/api';
+import AutoCompleteTagsForm from "./AutoCompleteTagsForm";
+import { deleteTags } from "../../utils/api";
 
 function DeleteTagForm({ tasks, setTasks, tags, setTags, showSnackbar}) {
 
@@ -32,9 +32,9 @@ function DeleteTagForm({ tasks, setTasks, tags, setTags, showSnackbar}) {
       const updatedTasks = tasks.map(task => ({
         ...task,
         tags: task.tags
-          .split(',')
+          .split(",")
           .filter(id => !tagsToBeDeleted.includes(Number(id)))
-          .join(','),
+          .join(","),
       }));
       
       setTags(updatedTags);
@@ -63,7 +63,7 @@ function DeleteTagForm({ tasks, setTasks, tags, setTags, showSnackbar}) {
         </Col>
         <Col sm={2}>
           <Button variant="contained"
-                  color='primary' 
+                  color="primary" 
                   startIcon={<DeleteIcon />} 
                   onClick={handleDeleteTag}
                   style={{marginTop: "8px"}}

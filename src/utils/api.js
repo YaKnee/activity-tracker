@@ -76,7 +76,7 @@ export const addTimestamp = async (newTimestampData) => {
 // Delete single timestamp
 export const deleteTimestamp = async (timestamp) => {
  await apiFetch(`${API}/timestamps/${timestamp.id}`, { method: "DELETE" });
-}
+};
 
 // Adds new task to the database, updating tags if necessary, and create a timestamp of this creation
 export const addTask = async (newTaskData, existingTags) => {
@@ -148,7 +148,6 @@ export const deleteTags = async (tagIds, tasks) => {
       .split(",")
       .filter(id => !tagIds.includes(Number(id)))
       .join(",");
-    console.log(updatedTags);
 
     await apiFetch(`${API}/tasks/${task.id}`, {
       method: "PUT",
@@ -162,9 +161,9 @@ export const deleteTags = async (tagIds, tasks) => {
 export const fetchTimesPerTask = async (taskId) => {
   const result = await apiFetch(`${API}/timesfortask/${taskId}`);
   return result;
-}
+};
 
-
+// Update settings for theme and mode change
 export const updateSettings = async (newSettings) => {
   const updatedSettingsResponse = await apiFetch(`${API}/options/${newSettings.id}`, {
     method: "PUT",
@@ -172,4 +171,4 @@ export const updateSettings = async (newSettings) => {
     body: JSON.stringify(newSettings),
   });
   return updatedSettingsResponse;
-}
+};

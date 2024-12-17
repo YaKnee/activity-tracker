@@ -7,7 +7,6 @@ html, body {
 }
 
 #root {
-  /* padding: 10px; */
   height: 100%;
   text-align: center;
   display: flex;
@@ -16,9 +15,7 @@ html, body {
 .nav-icons {
   margin-top: -5px;
 }
-/* .dropdown-menu {
-  background-color: transparent !important;
-} */
+
 .nav-drop-items {
   display: flex;
   text-align: right;
@@ -60,7 +57,10 @@ section::before {
   height: 2px;
   background-color: rgb(71, 71, 165);
   margin: 10px 0;
-  /* clear: both; */
+}
+
+th, tr, td {
+  border: 1px solid rgb(160 160 160);
 }
 
 #copyright{
@@ -69,34 +69,15 @@ section::before {
   bottom: 0;
 }
 
-
-
 .outline-text{
   color: white;
   background-color: white;
   text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
 }
-/* .active {
-  background-color: rgb(107, 230, 107);
-}
-.active:hover{
-  background-color: rgb(51, 185, 51) !important;
-}
-.inactive {
-  background-color: rgb(255, 64, 64); 
-}
-.inactive:hover {
-  background-color: red !important;
-}
-.inactive:focus{
-  background-color: rgb(186, 0, 0) !important;
-} */
+
 /*======================================Tasks=================================*/
 .task-grid {
-  /* min-height: 80vh;
-  max-height: 150vh; */
   overflow-y: auto;
-  /* scrollbar-color: #1976D2 #767676;  */
   display: flex; 
   flex-flow: wrap;
   justify-content: center;
@@ -135,8 +116,6 @@ section::before {
 
 .task-container td {
   padding: 8px 0;
-  /* max-height: 30px; */
-  /* color: #555; */
 }
 
 
@@ -184,9 +163,4 @@ caption {
   text-align: center;
   padding: 10px;
 }
-thead, tfoot {
-  background-color: rgb(96, 98, 253);
-}
-th, td {
-  border: 1px solid rgb(160 160 160);
-}
+

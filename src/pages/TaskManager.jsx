@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 import AddTaskOrTagsForm from "../components/forms/AddTaskOrTagsForm";
 import DeleteTagForm from "../components/forms/DeleteTagForm";

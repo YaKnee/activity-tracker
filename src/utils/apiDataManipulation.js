@@ -25,7 +25,7 @@ export const getTaskSpecificTotalActiveTime = (timestamps) => {
 
 // Creates an array of active times per for a specific task in a specific time range
 // (Very excessive but works so don't touch it...)
-export const getActiveTimesInTimeRange = (task, timeRange, accuracy) => {
+export const getActiveTimesInTimeRange = (task, timeRange, unit) => {
   const start = dayjs(timeRange.start).startOf("day");
   const end = dayjs(timeRange.end).endOf("day");
   const currentMoment = dayjs();
@@ -57,7 +57,7 @@ export const getActiveTimesInTimeRange = (task, timeRange, accuracy) => {
         dailyTimes.push({ date: day.format("DD-MM-YYYY"), totalTime: 0 });
       }
     }
-    return formatDailyTimes(dailyTimes, accuracy);
+    return formatDailyTimes(dailyTimes, unit);
   }
 
   // Case 3: Timestamps in range
@@ -78,7 +78,7 @@ export const getActiveTimesInTimeRange = (task, timeRange, accuracy) => {
     let activeStartTime = null;
     let totalTime = 0;
     // Find timestamps for this day in loop
-    let dailyTimestamps = timestamps.filter(ts => dayjs(ts.time).isSame(day, 'day'));
+    const dailyTimestamps = timestamps.filter(ts => dayjs(ts.time).isSame(day, 'day'));
     // If there are timestamps
     if (dailyTimestamps.length > 0) {
       // Calculate time between timestamps
@@ -160,7 +160,7 @@ export const getActiveTimesInTimeRange = (task, timeRange, accuracy) => {
         // If day in loop is current day
         if (day.isSame(currentMoment, "day")) {
           //
-          totalTime = currentMoment.diff(day, "seconds")
+          totalTime = currentMoment.diff(day, "seconds");
         } else { // Not the same day
           totalTime = 86400;
         }
@@ -172,16 +172,16 @@ export const getActiveTimesInTimeRange = (task, timeRange, accuracy) => {
     dailyTimes.push({ date: day.format("DD-MM-YYYY"), totalTime });
   }
   
-  return formatDailyTimes(dailyTimes, accuracy);
+  return formatDailyTimes(dailyTimes, unit);
 };
 
-// Helper function to format the output based on the required accuracy
-const formatDailyTimes = (dailyTimes, accuracy) => {
+// Format array depending on 
+const formatDailyTimes = (dailyTimes, unit) => {
   return dailyTimes.map(entry => {
     let formattedTotalTime;
-    if (accuracy === "minutes") {
+    if (unit === "minutes") {
       formattedTotalTime = Math.min((entry.totalTime / 60), 1440).toFixed(2);
-    } else if (accuracy === "hours") {
+    } else if (unit === "hours") {
       formattedTotalTime = Math.min((entry.totalTime / 3600), 24).toFixed(2);
     } else {
       formattedTotalTime = Math.min(entry.totalTime, 86400);
@@ -193,21 +193,21 @@ const formatDailyTimes = (dailyTimes, accuracy) => {
   });
 };
 
-
+// Gets intervals of activity that overlap a time range
 export const getActivityIntervals = (task, timeRange) => {
   const start = dayjs(timeRange.start);
   const end = dayjs(timeRange.end);
   const timestamps = task.timestamps;
-  let intervals = [];
+  const intervals = [];
   let currentStart = null;
 
   timestamps.forEach((timestamp) => {
     const time = dayjs(timestamp.time);
     if (timestamp.type === 0) {
-      // Mark the start of an activity
+      // Mark start of an activity
       currentStart = time;
     } else if (timestamp.type === 1 && currentStart) {
-      // Mark the end of an activity and add the interval if it overlaps the range
+      // Mark end of an activity and add interval if it overlaps range
       if (currentStart.isBefore(end) && time.isAfter(start)) {
         intervals.push({
           id: timestamp.id,
@@ -240,7 +240,7 @@ export const getActivityIntervals = (task, timeRange) => {
     .sort((a, b) => dayjs(b.time).diff(dayjs(a.time)))
     .pop();
 
-  // Adjust the first interval's start if the last timestamp before start is type 0
+  // Adjust the first interval start if the last timestamp before start is type 0
   if (intervals.length > 0 && lastTimestampBeforeStart && lastTimestampBeforeStart.type === 0) {
     const firstInterval = intervals[0];
     const newStart = dayjs(lastTimestampBeforeStart.time);
@@ -250,7 +250,7 @@ export const getActivityIntervals = (task, timeRange) => {
     };
   }
 
-  // Adjust the last interval's end if the last timestamp after end is type 1
+  // Adjust the last interval end if the last timestamp after end is type 1
   if (intervals.length > 0 && lastTimestampAfterEnd && lastTimestampAfterEnd.type === 1) {
     const lastInterval = intervals[intervals.length - 1];
     const newEnd = dayjs(lastTimestampAfterEnd.time);

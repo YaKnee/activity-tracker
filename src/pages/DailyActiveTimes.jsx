@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 import dayjs from "dayjs";
 
@@ -33,6 +33,7 @@ function DailyActiveTimes({ taskStates, chosenTask, setChosenTask, darkMode }) {
     }
     return [];
   }, [chosenTask, timeRange, unit]);
+  
   // Set dailyTimes based on dayEntries
   useEffect(() => {
     setDailyTimes(dayEntries);

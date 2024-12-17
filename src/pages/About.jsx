@@ -1,15 +1,13 @@
-import React from "react";
-
-import { Table } from "react-bootstrap";
+import Table from "react-bootstrap/Table";
 
 function About({ darkMode }) {
   return (
     <>
       <section>
         <h3>
-          Author:{" "}
+          Author:
           <em>
-            <strong>Jani O&#39;Connell</strong>
+            <strong> Jani O&#39;Connell</strong>
           </em>
         </h3>
       </section>
@@ -23,6 +21,8 @@ function About({ darkMode }) {
           apparent, is that one can add either tasks or tags from the same
           submission area (see "Manager"). While the button does change text and
           there are alerts assisting you, it could probably be more apparent.
+          And the fact that you can create tags whilst editing a task is also
+          not readily apparent.
         </p>
       </section>
 
@@ -72,6 +72,9 @@ function About({ darkMode }) {
               Calculating the average total time in DailyBarChart component and
               copying it to an array the same size as the dayEntries array.
             </p>
+          </li>
+          <li>
+            <p>General debugging</p>
           </li>
         </ul>
       </section>

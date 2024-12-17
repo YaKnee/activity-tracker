@@ -1,5 +1,3 @@
-import React, { useEffect } from "react";
-
 import dayjs from "dayjs";
 
 import { styled } from "@mui/material/styles";
@@ -93,7 +91,7 @@ function Settings({
 
     try {
       await updateSettings(newSettings);
-      showSnackbar("Theme has been updated in the backend.", "success");
+      showSnackbar("Theme has been updated in the backend.", "info");
     } catch (error) {
       showSnackbar("Failed to update theme in the backend.", "error");
       console.error("Failed to update settings:", error);
@@ -103,7 +101,7 @@ function Settings({
   // Update selectionMode when user changes the mode
   const handleModeChange = async (event, newMode) => {
     if (newMode === null) {
-      showSnackbar("You are already in this mode.", "info")
+      showSnackbar("You are already in this mode.", "warning");
     }else {
       setSelectionMode(newMode);
       const updatedSettings = {
@@ -116,15 +114,9 @@ function Settings({
       try {
         await updateSettings(updatedSettings);
         if (newMode === 0) {
-          showSnackbar(
-            "You can now activate multiple tasks at once.",
-            "success"
-          );
+          showSnackbar("You can now activate multiple tasks at once.", "info");
         } else {
-          showSnackbar(
-            "You can now only have 1 active task at any given time.",
-            "success"
-          );
+          showSnackbar("You can now only have 1 active task at any given time.","info");
 
           // Find the most recently active task based on timestamps
           const mostRecentActiveTask = taskStates

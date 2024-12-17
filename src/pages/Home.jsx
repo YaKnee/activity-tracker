@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
@@ -8,18 +7,42 @@ import CardMedia from "@mui/material/CardMedia";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import LinkIcon from "@mui/icons-material/Link";
+import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
 
-function Home({ tasks, tags, timestamps, showSnackbar }) {
+function ImageWithLoader({ src, alt, sx }) {
+  const [loading, setLoading] = useState(true);
+
+  return (
+    <Box sx={{ position: "relative", display: "inline-block" }}>
+      {loading && (
+        <CircularProgress
+          sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}
+        />
+      )}
+      <CardMedia
+        component="img"
+        sx={{ ...sx, display: loading ? "none" : "block" }}
+        src={src}
+        alt={alt}
+        onLoad={() => setLoading(false)}
+      />
+    </Box>
+  );
+}
+
+function Home() {
   return (
     <>
       <section>
         <h1>Activity Tracker</h1>
         <p style={{ textAlign: "justify", textJustify: "inter-word" }}>
-          In this website, you can freely manage all your tasks at the click of
-          a button. It provides different views to monitor and analyse your
-          current tasks, providing graphs and tables to easily track your most
-          important tasks. You can assign tags to these tasks to easily group
-          common tasks together, for easier review.
+          Welcome to the Activity Tracker app. In this website, you can freely
+          manage all your tasks at the click of a button. It provides different
+          views to monitor and analyse your current tasks, providing graphs and
+          tables to easily track your most important tasks. You can assign tags
+          to these tasks to easily group common tasks together, for easier
+          review.
         </p>
       </section>
       <section style={{ marginBottom: "50px" }}>
@@ -28,26 +51,28 @@ function Home({ tasks, tags, timestamps, showSnackbar }) {
           style={{
             display: "inline-flex",
             flexWrap: "wrap",
-            justifyContent: "space-evenly",
+            justifyContent: "space-around",
             width: "100%",
             boxSizing: "border-box",
-            textAlign: "justify", 
-            textJustify: "inter-word"
+            textAlign: "justify",
+            textJustify: "inter-word",
           }}
         >
           <Card
+            raised
+            className="my-2"
             sx={{
-              maxWidth: 325,
+              minWidth: 300,
+              maxWidth: 350,
               display: "flex",
               flexDirection: "column",
-              margin: "20px",
-              padding: "5px",
+              border: "2px solid black",
             }}
           >
-            <CardMedia
-              sx={{ height: 400 }}
-              image="manager_preview.png"
-              title="Task Manager Preview"
+            <ImageWithLoader
+              src="manager_preview.jpg"
+              alt="Task Manager Preview"
+              sx={{ height: 300, padding: 1 }}
             />
             <CardContent style={{ flex: 1 }}>
               <Typography variant="h5" component="div">
@@ -57,9 +82,9 @@ function Home({ tasks, tags, timestamps, showSnackbar }) {
                 Tasks
               </Typography>
               <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                This section allows you to create, edit, delete and monitor
-                tasks. You are also able to create and delete tags in this
-                section.
+                Access the main hub for creating, editing, and organizing tasks.
+                You are also able to create and delete tags in this section for
+                easy categorisation and efficient task grouping.
               </Typography>
             </CardContent>
             <CardActions>
@@ -77,17 +102,20 @@ function Home({ tasks, tags, timestamps, showSnackbar }) {
           </Card>
 
           <Card
+            raised
+            className="my-2"
             sx={{
-              maxWidth: 325,
+              minWidth: 300,
+              maxWidth: 350,
               display: "flex",
               flexDirection: "column",
-              margin: "20px",
-              padding: "5px",
+              border: "2px solid black",
             }}
           >
             <CardMedia
-              sx={{ height: 400 }}
-              image="daily_preview.png"
+              component="img"
+              sx={{ height: 300, padding: 1 }}
+              image="daily_preview.jpg"
               title="Daily Times Preview"
             />
             <CardContent style={{ flex: 1 }}>
@@ -100,8 +128,8 @@ function Home({ tasks, tags, timestamps, showSnackbar }) {
               <Typography variant="body2" sx={{ color: "text.secondary" }}>
                 This section provides you with a bar chart depicting daily
                 active times for a chosen task within a chosen range. You can
-                change the units of feedback from seconds to hours for better
-                precision.
+                change the units of feedback from seconds to hours for a more
+                precise understanding of task durations.
               </Typography>
             </CardContent>
             <CardActions>
@@ -119,17 +147,20 @@ function Home({ tasks, tags, timestamps, showSnackbar }) {
           </Card>
 
           <Card
+            raised
+            className="my-2"
             sx={{
-              maxWidth: 325,
+              minWidth: 300,
+              maxWidth: 350,
               display: "flex",
               flexDirection: "column",
-              margin: "20px",
-              padding: "5px",
+              border: "2px solid black",
             }}
           >
             <CardMedia
-              sx={{ height: 400 }}
-              image="interval_preview.png"
+              component="img"
+              sx={{ height: 300, padding: 1 }}
+              image="interval_preview.jpg"
               title="Activity Interval Preview"
             />
             <CardContent style={{ flex: 1 }}>
@@ -140,10 +171,11 @@ function Home({ tasks, tags, timestamps, showSnackbar }) {
                 Displays
               </Typography>
               <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                This section provides you with a table depicting the time
-                starting and ending times of when a task has been active within
-                a chosen range, with second precision. It shows any interval
-                that overlaps the range chosen.
+                Explore your task history with precise interval tracking. This
+                section provides you with a table depicting the starting and
+                ending times of when a task has been active within a chosen
+                range, with second precision. It shows any interval that
+                overlaps the range chosen.
               </Typography>
             </CardContent>
             <CardActions>
@@ -161,17 +193,20 @@ function Home({ tasks, tags, timestamps, showSnackbar }) {
           </Card>
 
           <Card
+            raised
+            className="my-2"
             sx={{
-              maxWidth: 325,
+              minWidth: 300,
+              maxWidth: 350,
               display: "flex",
               flexDirection: "column",
-              margin: "20px",
-              padding: "5px",
+              border: "2px solid black",
             }}
           >
             <CardMedia
-              sx={{ height: 400 }}
-              image="settings_preview.png"
+              component="img"
+              sx={{ height: 300, padding: 1 }}
+              image="settings_preview.jpg"
               title="Settings Preview"
             />
             <CardContent style={{ flex: 1 }}>
@@ -180,9 +215,9 @@ function Home({ tasks, tags, timestamps, showSnackbar }) {
               </Typography>
 
               <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                This section allows you to change the current theme between
-                light and dark mode. You can also change th emode of the Task
-                Manager so that you can have multiple tasks active at the same
+                Modify the app's theme and behavior to match your preferences.
+                Switch between light and dark modes or adjust how tasks are
+                managed so that you can have multiple tasks active at the same
                 time, or limit it to only one task active at any given moment.
               </Typography>
             </CardContent>
@@ -201,17 +236,20 @@ function Home({ tasks, tags, timestamps, showSnackbar }) {
           </Card>
 
           <Card
+            raised
+            className="my-2"
             sx={{
-              maxWidth: 325,
+              minWidth: 300,
+              maxWidth: 350,
               display: "flex",
               flexDirection: "column",
-              margin: "20px",
-              padding: "5px",
+              border: "2px solid black",
             }}
           >
             <CardMedia
-              sx={{ height: 400 }}
-              image="about_preview.png"
+              component="img"
+              sx={{ height: 300, padding: 1 }}
+              image="about_preview.jpg"
               title="About Preview"
             />
             <CardContent style={{ flex: 1 }}>
@@ -221,7 +259,7 @@ function Home({ tasks, tags, timestamps, showSnackbar }) {
 
               <Typography variant="body2" sx={{ color: "text.secondary" }}>
                 This section provides extra information on how to use the
-                application, accredits for content usage, as well as
+                application, acknowledgments for resources used, as well as
                 highlighting the most difficult aspect in developing this app.
               </Typography>
             </CardContent>

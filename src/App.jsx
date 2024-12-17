@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Routes, Route, Link, useLocation } from "react-router-dom";
 
 import dayjs from "dayjs";
@@ -109,6 +109,7 @@ function App() {
     setTaskStates(newTaskStates);
   }, [tasks, timestamps, tags]);
 
+  // Set chosenTask for displays
   useEffect(() => {
     if (taskStates.length > 0 && chosenTask === null) {
       setChosenTask(taskStates[0]);
@@ -144,6 +145,7 @@ function App() {
     setSnackbarOpen(true);
   };
 
+  // Close snackbar
   const handleCloseSnackbar = () => {
     setSnackbarOpen(false);
   };
@@ -202,7 +204,6 @@ function App() {
                   }
                   id="nav-task-dropdown"
                   bg="dark"
-                  db
                 >
                   <NavDropdown.Item
                     as={Link}
@@ -273,13 +274,9 @@ function App() {
             element={
               <ActivityTimeline
                 taskStates={taskStates}
-                setTaskStates={setTaskStates}
                 timestamps={timestamps}
-                setTimestamps={setTimestamps}
                 chosenTask={chosenTask}
                 setChosenTask={setChosenTask}
-                showSnackbar={showSnackbar}
-                darkMode={darkMode}
               />
             }
           />

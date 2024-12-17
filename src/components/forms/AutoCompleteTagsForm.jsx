@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import CancelRoundedIcon from '@mui/icons-material/CancelRounded';
+import { useEffect } from "react";
+import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import Autocomplete from "@mui/material/Autocomplete";
 import Chip from "@mui/material/Chip";
 import TextField from "@mui/material/TextField";
@@ -18,7 +18,7 @@ function AutoCompleteTagsForm({
 
   useEffect(() => {
     setSelectedTags(selectedTags);
-  }, [selectedTags]);
+  }, [selectedTags, setSelectedTags]);
 
   return (
     <>

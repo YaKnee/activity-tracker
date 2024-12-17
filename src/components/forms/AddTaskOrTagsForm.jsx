@@ -1,14 +1,13 @@
-import React, { useState} from "react";
+import { useState} from "react";
 
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import Form from 'react-bootstrap/Form';
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import Form from "react-bootstrap/Form";
 
-import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField"
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import TextField from "@mui/material/TextField";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
 import AutoCompleteTagsForm from "./AutoCompleteTagsForm";
 import { addTask, checkIfTagsExists } from "../../utils/api";
@@ -109,12 +108,13 @@ function AddTaskOrTagsForm({ setTasks, tags, setTags, setTimestamps, showSnackba
               />
             </Col>
             <Col sm={1}>
-            <Button variant="contained"
-                  color="primary"
-                  type="submit"
-                  startIcon={newTaskName || selectedTags.length > 0 ? <AddCircleOutlineIcon /> : null}
-                  className="my-4"
-                >
+              <Button 
+                variant="contained"
+                color="primary"
+                type="submit"
+                startIcon={newTaskName || selectedTags.length > 0 ? <AddCircleOutlineIcon /> : null}
+                className="my-4"
+              >
                 {newTaskName ? "Task" : selectedTags.length > 0 ? "Tags" : <AddCircleOutlineIcon />}
               </Button>
             </Col>

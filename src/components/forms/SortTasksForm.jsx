@@ -1,7 +1,4 @@
-import React, { useEffect, useState }from "react";
-
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
+import { useEffect, useState }from "react";
 
 import Stack from "@mui/material/Stack";
 import Dialog from "@mui/material/Dialog";
@@ -12,11 +9,10 @@ import DialogTitle from "@mui/material/DialogTitle";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import Button from "@mui/material/Button"
+import Button from "@mui/material/Button";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
-import ListIcon from '@mui/icons-material/List';
-import ArrowCircleUpTwoToneIcon from '@mui/icons-material/ArrowCircleUpTwoTone';
-import ArrowCircleDownTwoToneIcon from '@mui/icons-material/ArrowCircleDownTwoTone';
+import ArrowCircleUpTwoToneIcon from "@mui/icons-material/ArrowCircleUpTwoTone";
+import ArrowCircleDownTwoToneIcon from "@mui/icons-material/ArrowCircleDownTwoTone";
 
 const SortTasksForm = ({ taskStates, sortedTasks, setSortedTasks }) => {
 
@@ -30,7 +26,7 @@ const SortTasksForm = ({ taskStates, sortedTasks, setSortedTasks }) => {
 
   // Sorts tasks when either sorting criteria changes
   useEffect(() => {
-    handleSort()
+    handleSort();
   }, [sortingCriteria, sortedTasks]);
 
   // Updates criteria value based on user selection
@@ -51,15 +47,15 @@ const SortTasksForm = ({ taskStates, sortedTasks, setSortedTasks }) => {
 
   // Resets sorting criteria and closes dialog
   const handleRevert = () => {
-    setSortingCriteria({ value: "id", order: "ascending"})
+    setSortingCriteria({ value: "id", order: "ascending"});
     handleClose();
-  }
+  };
 
   // Handles sorting logic based on criteria
   const handleSort = () => {
     // Create shallow copy of states. Breaks if no copy
     const taskStatesCopy = [...taskStates];
-    const { value, order } = sortingCriteria
+    const { value, order } = sortingCriteria;
 
     taskStatesCopy.sort((a, b) => {
       let comparison = 0;
