@@ -1,3 +1,5 @@
+Created by: Teemu Heinimäki
+
 General Server and API Info
 ---------------------------
 
