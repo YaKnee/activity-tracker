@@ -7,15 +7,15 @@ This project leverages modern libraries and tools for both frontend and backend 
 
 ## Usage
 
-For instructions on how to setup and run the simple local backend, see the server's [README](https://github.com/YaKnee/activity-tracker/server/README.txt).
+For instructions on how to setup and run the simple local backend, see the server's [README](https://github.com/YaKnee/activity-tracker/blob/main/server/README.txt).
 
-To run the React project, simply navigate to the [frontend](https://github.com/YaKnee/activity-tracker/frontend) directory, install the necessary dependencies with `npm install` via the terminal, and then run the project with `npm run dev`. If you __initialised the server with a different port__, make sure to __update the PORT variable in the [api.js](https://github.com/YaKnee/activity-tracker/frontend/src/utils/api.js) file__ before running the project.
+To run the React project, simply navigate to the [frontend](https://github.com/YaKnee/activity-tracker/tree/main/frontend) directory, install the necessary dependencies with `npm install` via the terminal, and then run the project with `npm run dev`. If you __initialised the server with a different port__, make sure to __update the PORT variable in the [api.js](https://github.com/YaKnee/activity-tracker/blob/main/frontend/src/utils/api.js) file__ before running the project.
 
 
 ## Requirements
 - [x] Implement at least 3 different view with seperate content that is easily navigatable with a menu.
 - [x] One of the views must be an Info page providing requested information about the project.
-- [x] Application can communicate with the [simple local backend](https://github.com/YaKnee/activity-tracker/server/server.js) and automatically retrieve data to be loaded on frontend.
+- [x] Application can communicate with the [simple local backend](https://github.com/YaKnee/activity-tracker/blob/main/server/server.js) and automatically retrieve data to be loaded on frontend.
 - [x] User can add and delete tasks via the application's UI.
 - [x] User can edit tasks' names, and modifiy (create, apply, edit, remove) tasks' tags.
 - [x] Changes made via UI are stored in the backend.
